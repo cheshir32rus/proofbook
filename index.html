@@ -186,6 +186,9 @@
             font-size: 1.2rem;
         }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<base target="_blank">
 </head>
 <body>
 
@@ -356,6 +359,25 @@
 </div>
 
 <script>
+// ===================== FIREBASE CONFIG =====================
+const firebaseConfig = {
+  apiKey: "AIzaSyB1tGzwlXIjymsvyYXSTM2wei3uEdOR8I",
+  authDomain: "proofbook-dacha.firebaseapp.com",
+  projectId: "proofbook-dacha",
+  storageBucket: "proofbook-dacha.firebasestorage.app",
+  messagingSenderId: "494287550883",
+  appId: "1:494287550883:web:ec2b57cc2564c4cd948216"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Enable offline persistence
+db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+  console.log('Persistence error:', err);
+});
+
 let currentUser = null;
 let currentFilter = 'all';
 let cocktails = JSON.parse(localStorage.getItem('proofbook_cocktails')) || [];
@@ -534,7 +556,8 @@ function login(role) {
         document.getElementById('calcPortionPanel').style.display = 'block';
     }
 
-    renderCocktails();
+    // Load cocktails from Firebase
+    loadCocktailsFromFirebase();
     renderKnowledgeBase();
     initCalcIngredients();
 }
@@ -563,6 +586,52 @@ const catNames = { classic: 'Классика', author: 'Авторский', no
 const techNames = { shake: 'Шейк', stir: 'Стир', build: 'Билд', blend: 'Бленд', muddle: 'Мадл', layer: 'Лейринг', throw: 'Фроулинг', smoke: 'Копчение' };
 const glassNames = { rocks: 'Рокс', coupe: 'Купе', highball: 'Хайбол', collins: 'Коллинз', flute: 'Флейта', martini: 'Мартини', tiki: 'Тики', irish: 'Айриш', shot: 'Шот' };
 const iceNames = { cube: 'Кубики', crushed: 'Краш', collins: 'Коллато', sphere: 'Сфера', none: 'Без льда' };
+
+// ===================== FIREBASE SYNC =====================
+function loadCocktailsFromFirebase() {
+    db.collection('cocktails').onSnapshot(snapshot => {
+        cocktails = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            data.id = doc.id;
+            cocktails.push(data);
+        });
+        // Also save to localStorage for offline
+        localStorage.setItem('proofbook_cocktails', JSON.stringify(cocktails));
+        renderCocktails();
+    }, err => {
+        console.log('Firebase error, using local:', err);
+        // Fallback to localStorage if offline
+        cocktails = JSON.parse(localStorage.getItem('proofbook_cocktails')) || [];
+        renderCocktails();
+    });
+}
+
+function saveCocktailToFirebase(cocktail) {
+    if (!navigator.onLine) {
+        alert('Нет интернета. Коктейль сохранён локально, синхронизируется при подключении.');
+        return Promise.resolve();
+    }
+
+    if (cocktail.id && typeof cocktail.id === 'string' && cocktail.id.length > 10) {
+        // Update existing
+        const id = cocktail.id;
+        delete cocktail.id;
+        return db.collection('cocktails').doc(id).set(cocktail);
+    } else {
+        // Add new
+        delete cocktail.id;
+        return db.collection('cocktails').add(cocktail);
+    }
+}
+
+function deleteCocktailFromFirebase(id) {
+    if (!navigator.onLine) {
+        alert('Нет интернета. Удаление произойдёт при подключении.');
+        return Promise.resolve();
+    }
+    return db.collection('cocktails').doc(id).delete();
+}
 
 function renderCocktails() {
     const list = document.getElementById('cocktailsList');
@@ -705,7 +774,7 @@ function saveCocktail() {
     if (ingredients.length === 0) { alert('Добавьте хотя бы один ингредиент'); return; }
 
     const cocktail = {
-        id: editingIdx !== null ? cocktails[editingIdx].id : Date.now(),
+        id: editingIdx !== null ? cocktails[editingIdx].id : null,
         name: name,
         category: document.getElementById('newCategory').value,
         technique: document.getElementById('newTechnique').value,
@@ -715,18 +784,17 @@ function saveCocktail() {
         tech: document.getElementById('newTech').value,
         garnish: document.getElementById('newGarnish').value,
         cost: parseFloat(document.getElementById('newCost').value) || 0,
-        sellPrice: parseFloat(document.getElementById('newPrice').value) || 0
+        sellPrice: parseFloat(document.getElementById('newPrice').value) || 0,
+        updatedAt: new Date().toISOString()
     };
 
-    if (editingIdx !== null) {
-        cocktails[editingIdx] = cocktail;
-    } else {
-        cocktails.push(cocktail);
-    }
-
-    localStorage.setItem('proofbook_cocktails', JSON.stringify(cocktails));
-    closeAddModal();
-    renderCocktails();
+    saveCocktailToFirebase(cocktail).then(() => {
+        closeAddModal();
+        // renderCocktails will be called by onSnapshot listener
+    }).catch(err => {
+        console.error('Save error:', err);
+        alert('Ошибка сохранения. Проверьте интернет.');
+    });
 }
 
 function editCocktail(idx) {
@@ -756,9 +824,19 @@ function editCocktail(idx) {
 
 function deleteCocktail(idx) {
     if (confirm('Удалить техкарку "' + cocktails[idx].name + '"?')) {
-        cocktails.splice(idx, 1);
-        localStorage.setItem('proofbook_cocktails', JSON.stringify(cocktails));
-        renderCocktails();
+        const id = cocktails[idx].id;
+        if (id && typeof id === 'string' && id.length > 10) {
+            deleteCocktailFromFirebase(id).then(() => {
+                // renderCocktails will be called by onSnapshot listener
+            }).catch(err => {
+                console.error('Delete error:', err);
+                alert('Ошибка удаления. Проверьте интернет.');
+            });
+        } else {
+            cocktails.splice(idx, 1);
+            localStorage.setItem('proofbook_cocktails', JSON.stringify(cocktails));
+            renderCocktails();
+        }
     }
 }
 
