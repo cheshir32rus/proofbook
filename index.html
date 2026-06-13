@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>ProofBook</title>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiUHJvb2ZCb29rIiwic2hvcnRfbmFtZSI6IlByb29mQm9vayIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMWEwZjBhIiwidGhlbWVfY29sb3IiOiIjMWEwZjBhIn0=">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        :root { --bg-dark:#1a0f0a; --bg-card:rgba(40,30,25,0.85); --bg-card-hover:rgba(50,38,32,0.9); --accent:#c9a96e; --accent-light:#e0c9a0; --accent-glow:rgba(201,169,110,0.15); --text-primary:#f5e6d3; --text-secondary:#a89080; --text-muted:#6b5b50; --border:rgba(201,169,110,0.15); --danger:#c44; --success:#4a8; --glass:rgba(40,30,25,0.72); --glass-border:rgba(201,169,110,0.12); }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        body { font-family:'Inter',sans-serif; background:var(--bg-dark); color:var(--text-primary); min-height:100vh; overflow-x:hidden; line-height:1.6; }
+        body::before { content:''; position:fixed; top:0;left:0;right:0;bottom:0; background:radial-gradient(ellipse at 20% 50%,rgba(201,169,110,0.03) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(201,169,110,0.02) 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(100,60,40,0.04) 0%,transparent 50%); pointer-events:none; z-index:-1; }
+        .login-screen { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:24px; text-align:center; }
+        .logo { font-family:'Playfair Display',serif; font-size:3.2rem; font-weight:700; color:var(--accent); letter-spacing:3px; margin-bottom:8px; text-shadow:0 0 40px rgba(201,169,110,0.3); }
+        .logo-subtitle { font-family:'Playfair Display',serif; font-size:0.95rem; color:var(--text-secondary); letter-spacing:6px; text-transform:uppercase; margin-bottom:48px; }
+        .role-selector { display:flex; flex-direction:column; gap:16px; width:100%; max-width:320px; }
+        .role-btn { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:24px 20px; cursor:pointer; transition:all 0.3s ease; text-align:left; position:relative; overflow:hidden; }
+        .role-btn::before { content:''; position:absolute; top:0;left:0;right:0;bottom:0; background:linear-gradient(135deg,transparent 0%,rgba(201,169,110,0.05) 100%); opacity:0; transition:opacity 0.3s; }
+        .role-btn:hover::before,.role-btn:active::before { opacity:1; }
+        .role-btn:hover { border-color:rgba(201,169,110,0.3); transform:translateY(-2px); box-shadow:0 8px 32px rgba(0,0,0,0.3),0 0 20px var(--accent-glow); }
+        .role-btn .role-icon { font-size:2rem; margin-bottom:12px; display:block; }
+        .role-btn .role-title { font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--accent-light); margin-bottom:4px; }
+        .role-btn .role-desc { font-size:0.8rem; color:var(--text-muted); }
+        .app-container { display:none; min-height:100vh; padding-bottom:80px; }
+        .app-header { position:sticky; top:0; z-index:100; background:rgba(26,15,10,0.95); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:16px 20px; display:flex; align-items:center; justify-content:space-between; }
+        .app-header .logo-small { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--accent); letter-spacing:2px; }
+        .app-header .user-role { font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; background:var(--bg-card); padding:4px 12px; border-radius:20px; border:1px solid var(--border); }
+        .logout-btn { background:none; border:1px solid var(--border); color:var(--text-secondary); padding:6px 14px; border-radius:20px; font-size:0.75rem; cursor:pointer; transition:all 0.2s; }
+        .logout-btn:hover { border-color:var(--accent); color:var(--accent); }
+        .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(26,15,10,0.95); backdrop-filter:blur(20px); border-top:1px solid var(--border); display:flex; justify-content:space-around; padding:8px 0 20px; z-index:100; }
+        .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 16px; cursor:pointer; color:var(--text-muted); transition:all 0.2s; border:none; background:none; font-family:inherit; font-size:0.65rem; text-transform:uppercase; letter-spacing:1px; }
+        .nav-item.active { color:var(--accent); }
+        .nav-item .nav-icon { font-size:1.4rem; }
+        .section { display:none; padding:20px; max-width:800px; margin:0 auto; animation:fadeIn 0.3s ease; }
+        .section.active { display:block; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        .section-title { font-family:'Playfair Display',serif; font-size:1.8rem; color:var(--accent-light); margin-bottom:8px; }
+        .section-subtitle { color:var(--text-muted); font-size:0.85rem; margin-bottom:24px; }
+        .search-box { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:12px 16px; width:100%; color:var(--text-primary); font-family:inherit; font-size:0.9rem; margin-bottom:16px; outline:none; transition:border-color 0.2s; }
+        .search-box:focus { border-color:var(--accent); }
+        .search-box::placeholder { color:var(--text-muted); }
+        .filter-tags { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+        .filter-tag { background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary); padding:6px 14px; border-radius:20px; font-size:0.8rem; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+        .filter-tag.active { background:var(--accent); color:var(--bg-dark); border-color:var(--accent); font-weight:500; }
+        .card { background:var(--glass); backdrop-filter:blur(12px); border:1px solid var(--glass-border); border-radius:16px; padding:20px; margin-bottom:16px; cursor:pointer; transition:all 0.3s ease; position:relative; overflow:hidden; }
+        .card::before { content:''; position:absolute; top:0;left:0;right:0;height:1px; background:linear-gradient(90deg,transparent,rgba(201,169,110,0.3),transparent); }
+        .card:hover { background:var(--bg-card-hover); border-color:rgba(201,169,110,0.25); transform:translateY(-2px); box-shadow:0 8px 32px rgba(0,0,0,0.3); }
+        .card-title { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--accent-light); margin-bottom:4px; }
+        .card-meta { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
+        .card-meta span { font-size:0.75rem; color:var(--text-muted); background:rgba(201,169,110,0.08); padding:2px 10px; border-radius:10px; }
+        .card-desc { font-size:0.85rem; color:var(--text-secondary); line-height:1.5; }
+        .card-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+        .btn-small { background:rgba(201,169,110,0.1); border:1px solid var(--border); color:var(--accent); padding:6px 14px; border-radius:8px; font-size:0.75rem; cursor:pointer; transition:all 0.2s; font-family:inherit; }
+        .btn-small:hover { background:rgba(201,169,110,0.2); border-color:var(--accent); }
+        .btn-small.danger { color:var(--danger); border-color:rgba(204,68,68,0.3); background:rgba(204,68,68,0.08); }
+        .btn-small.danger:hover { background:rgba(204,68,68,0.15); border-color:var(--danger); }
+        .fab { position:fixed; bottom:90px; right:20px; width:56px; height:56px; background:linear-gradient(135deg,var(--accent),#b8935f); border:none; border-radius:50%; color:var(--bg-dark); font-size:1.8rem; cursor:pointer; box-shadow:0 4px 20px rgba(201,169,110,0.3); transition:all 0.3s; z-index:99; display:flex; align-items:center; justify-content:center; }
+        .fab:hover { transform:scale(1.05); box-shadow:0 6px 30px rgba(201,169,110,0.4); }
+        .modal-overlay { display:none; position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.7); z-index:200; align-items:center; justify-content:center; padding:20px; }
+        .modal-overlay.active { display:flex; }
+        .modal { background:var(--bg-dark); border:1px solid var(--border); border-radius:20px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; padding:24px; animation:slideUp 0.3s ease; }
+        @keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+        .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+        .modal-title { font-family:'Playfair Display',serif; font-size:1.5rem; color:var(--accent-light); }
+        .modal-close { background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer; padding:4px; }
+        .modal-close:hover { color:var(--accent); }
+        .form-group { margin-bottom:16px; }
+        .form-label { display:block; font-size:0.8rem; color:var(--text-secondary); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px; }
+        .form-input,.form-select,.form-textarea { width:100%; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:12px 14px; color:var(--text-primary); font-family:inherit; font-size:0.9rem; outline:none; transition:border-color 0.2s; }
+        .form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--accent); }
+        .form-textarea { min-height:80px; resize:vertical; }
+        .form-select option { background:var(--bg-dark); color:var(--text-primary); }
+        .btn-primary { background:linear-gradient(135deg,var(--accent),#b8935f); border:none; color:var(--bg-dark); padding:14px 28px; border-radius:12px; font-family:inherit; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.2s; width:100%; margin-top:8px; }
+        .btn-primary:hover { transform:translateY(-1px); box-shadow:0 4px 20px rgba(201,169,110,0.3); }
+        .ingredient-row { display:grid; grid-template-columns:2fr 1fr 1fr 40px; gap:8px; margin-bottom:8px; align-items:center; }
+        .ingredient-row input { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--text-primary); font-family:inherit; font-size:0.85rem; outline:none; }
+        .ingredient-row input:focus { border-color:var(--accent); }
+        .remove-ingredient { background:rgba(204,68,68,0.1); border:1px solid rgba(204,68,68,0.3); color:var(--danger); border-radius:8px; width:36px; height:36px; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+        .add-ingredient-btn { background:rgba(201,169,110,0.1); border:1px dashed var(--border); color:var(--accent); padding:10px; border-radius:8px; cursor:pointer; font-family:inherit; font-size:0.85rem; width:100%; margin-top:4px; transition:all 0.2s; }
+        .add-ingredient-btn:hover { border-color:var(--accent); background:rgba(201,169,110,0.15); }
+        .calc-tabs { display:flex; gap:8px; margin-bottom:20px; }
+        .calc-tab { flex:1; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary); padding:12px; border-radius:12px; cursor:pointer; font-family:inherit; font-size:0.85rem; text-align:center; transition:all 0.2s; }
+        .calc-tab.active { background:var(--accent); color:var(--bg-dark); border-color:var(--accent); font-weight:600; }
+        .calc-result { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:20px; margin-top:20px; }
+        .calc-result-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); }
+        .calc-result-row:last-child { border-bottom:none; }
+        .calc-result-label { color:var(--text-secondary); font-size:0.85rem; }
+        .calc-result-value { color:var(--accent-light); font-weight:600; font-size:1rem; }
+        .calc-result-value.highlight { color:var(--accent); font-size:1.2rem; }
+        .kb-category { margin-bottom:24px; }
+        .kb-category-title { font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--accent); margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+        .kb-item { background:var(--glass); border:1px solid var(--glass-border); border-radius:12px; padding:16px; margin-bottom:10px; cursor:pointer; transition:all 0.2s; }
+        .kb-item:hover { border-color:rgba(201,169,110,0.25); background:var(--bg-card-hover); }
+        .kb-item-title { font-weight:600; color:var(--text-primary); margin-bottom:4px; }
+        .kb-item-preview { font-size:0.8rem; color:var(--text-muted); }
+        .kb-detail { display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); font-size:0.85rem; color:var(--text-secondary); line-height:1.7; }
+        .kb-item.expanded .kb-detail { display:block; }
+        .kb-item.expanded .kb-item-preview { display:none; }
+        .empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
+        .empty-state-icon { font-size:3rem; margin-bottom:16px; opacity:0.5; }
+        .empty-state-text { font-size:0.9rem; }
+        .detail-view { display:none; }
+        .detail-view.active { display:block; }
+        .detail-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
+        .detail-title { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--accent-light); }
+        .detail-category { display:inline-block; background:rgba(201,169,110,0.1); color:var(--accent); padding:4px 12px; border-radius:20px; font-size:0.75rem; margin-top:8px; }
+        .detail-section { margin-bottom:24px; }
+        .detail-section-title { font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--accent); margin-bottom:12px; }
+        .detail-ingredients { background:var(--bg-card); border-radius:12px; padding:16px; }
+        .detail-ingredient { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:0.9rem; }
+        .detail-ingredient:last-child { border-bottom:none; }
+        .detail-ingredient-name { color:var(--text-primary); }
+        .detail-ingredient-amount { color:var(--accent); font-weight:500; }
+        .detail-tech { background:var(--bg-card); border-radius:12px; padding:16px; font-size:0.9rem; line-height:1.7; color:var(--text-secondary); }
+        .detail-meta-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+        .detail-meta-item { background:var(--bg-card); border-radius:10px; padding:12px; text-align:center; }
+        .detail-meta-label { font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+        .detail-meta-value { font-size:1rem; color:var(--accent-light); font-weight:600; }
+        .back-btn { background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary); padding:8px 16px; border-radius:10px; cursor:pointer; font-family:inherit; font-size:0.85rem; margin-bottom:16px; transition:all 0.2s; }
+        .back-btn:hover { border-color:var(--accent); color:var(--accent); }
+        @media(min-width:768px){ .section{padding:30px} .card{padding:24px} }
+        ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:var(--bg-dark)} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px} ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+        .calc-ingredient-row { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 40px; gap:6px; margin-bottom:6px; align-items:center; }
+        .calc-ingredient-row input,.calc-ingredient-row select { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--text-primary); font-family:inherit; font-size:0.8rem; outline:none; }
+        .calc-ingredient-row input:focus,.calc-ingredient-row select:focus { border-color:var(--accent); }
+        .calc-ingredient-row select { cursor:pointer; }
+    
+        .pin-panel {
+            animation: fadeIn 0.3s ease;
+        }
+        .pin-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--accent-light);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .pin-display {
+            font-size: 2.5rem;
+            color: var(--accent);
+            letter-spacing: 12px;
+            text-align: center;
+            margin-bottom: 24px;
+            font-weight: 600;
+            min-height: 3rem;
+        }
+        .pin-error {
+            color: var(--danger);
+            font-size: 0.85rem;
+            text-align: center;
+            margin-bottom: 16px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .pin-error.show { opacity: 1; }
+        .pin-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .pin-key {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            font-family: inherit;
+            padding: 18px 0;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .pin-key:hover {
+            border-color: var(--accent);
+            background: var(--bg-card-hover);
+        }
+        .pin-key:active {
+            transform: scale(0.95);
+            background: rgba(201, 169, 110, 0.1);
+        }
+        .pin-key-action {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+    <div class="logo">ProofBook</div>
+    <div class="logo-subtitle">Барная книга знаний</div>
+
+    <div class="role-selector" id="roleSelector">
+        <div class="role-btn" onclick="showPinInput('barmaster')">
+            <span class="role-icon">🍸</span>
+            <div class="role-title">BarMaster</div>
+            <div class="role-desc">Полный доступ: техкарты, база знаний, калькулятор, настройки</div>
+        </div>
+        <div class="role-btn" onclick="login('bartender')">
+            <span class="role-icon">🥃</span>
+            <div class="role-title">Bartender</div>
+            <div class="role-desc">Просмотр: техкарты, база знаний, калькулятор</div>
+        </div>
+    </div>
+
+    <div class="pin-panel" id="pinPanel" style="display:none;width:100%;max-width:320px;">
+        <div class="pin-title">Введите PIN-код</div>
+        <div class="pin-display" id="pinDisplay">••••</div>
+        <div class="pin-error" id="pinError">Неверный PIN-код</div>
+        <div class="pin-keypad">
+            <button class="pin-key" onclick="pinPress('1')">1</button>
+            <button class="pin-key" onclick="pinPress('2')">2</button>
+            <button class="pin-key" onclick="pinPress('3')">3</button>
+            <button class="pin-key" onclick="pinPress('4')">4</button>
+            <button class="pin-key" onclick="pinPress('5')">5</button>
+            <button class="pin-key" onclick="pinPress('6')">6</button>
+            <button class="pin-key" onclick="pinPress('7')">7</button>
+            <button class="pin-key" onclick="pinPress('8')">8</button>
+            <button class="pin-key" onclick="pinPress('9')">9</button>
+            <button class="pin-key pin-key-action" onclick="pinBackspace()">⌫</button>
+            <button class="pin-key" onclick="pinPress('0')">0</button>
+            <button class="pin-key pin-key-action" onclick="pinCancel()">✕</button>
+        </div>
+    </div>
+</div>
+
+<div class="app-container" id="appContainer">
+    <header class="app-header">
+        <div class="logo-small">ProofBook</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <span class="user-role" id="userRoleBadge">Bartender</span>
+            <button class="logout-btn" onclick="logout()">Выйти</button>
+        </div>
+    </header>
+
+    <div class="section active" id="sectionCocktails">
+        <div class="section-title">Коктейльные техкарты</div>
+        <div class="section-subtitle">Все рецепты в одном месте</div>
+        <input type="text" class="search-box" id="cocktailSearch" placeholder="Поиск по названию или ингредиенту..." oninput="filterCocktails()">
+        <div class="filter-tags" id="cocktailFilters">
+            <div class="filter-tag active" onclick="setFilter('all')">Все</div>
+            <div class="filter-tag" onclick="setFilter('classic')">Классика</div>
+            <div class="filter-tag" onclick="setFilter('author')">Авторские</div>
+            <div class="filter-tag" onclick="setFilter('nonalco')">Безалкогольные</div>
+            <div class="filter-tag" onclick="setFilter('shot')">Шоты</div>
+        </div>
+        <div id="cocktailsList"></div>
+        <div class="empty-state" id="emptyCocktails" style="display:none;">
+            <div class="empty-state-icon">🍹</div>
+            <div class="empty-state-text">Пока нет коктейлей. Нажмите + чтобы добавить первый.</div>
+        </div>
+    </div>
+
+    <div class="section" id="sectionKnowledge">
+        <div class="section-title">База знаний</div>
+        <div class="section-subtitle">Профессиональная барная мудрость</div>
+        <input type="text" class="search-box" id="kbSearch" placeholder="Поиск по базе знаний..." oninput="filterKB()">
+        <div id="kbContent"></div>
+    </div>
+
+    <div class="section" id="sectionCalculator">
+        <div class="section-title">Калькулятор</div>
+        <div class="section-subtitle">Себестоимость и порции</div>
+        <div class="calc-tabs" id="calcTabs">
+            <div class="calc-tab active" onclick="switchCalcTab('cost')" id="tabCost">Себестоимость</div>
+            <div class="calc-tab" onclick="switchCalcTab('portion')" id="tabPortion">Порции</div>
+        </div>
+        <div id="calcCostPanel">
+            <div class="form-group">
+                <label class="form-label">Название коктейля</label>
+                <input type="text" class="form-input" id="calcCocktailName" placeholder="Например, Олд Фэшн">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Ингредиенты</label>
+                <div id="calcIngredients"></div>
+                <button class="add-ingredient-btn" onclick="addCalcIngredient()">+ Добавить ингредиент</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Цена продажи (₽)</label>
+                <input type="number" class="form-input" id="calcSellPrice" placeholder="450" oninput="calculateCost()">
+            </div>
+            <button class="btn-primary" onclick="calculateCost()">Рассчитать</button>
+            <div class="calc-result" id="costResult" style="display:none;">
+                <div class="calc-result-row"><span class="calc-result-label">Себестоимость порции</span><span class="calc-result-value highlight" id="costPerPortion">0 ₽</span></div>
+                <div class="calc-result-row"><span class="calc-result-label">Food Cost %</span><span class="calc-result-value" id="foodCostPercent">0%</span></div>
+                <div class="calc-result-row"><span class="calc-result-label">Наценка</span><span class="calc-result-value" id="markupPercent">0%</span></div>
+                <div class="calc-result-row"><span class="calc-result-label">Прибыль на порцию</span><span class="calc-result-value" id="profitPerPortion">0 ₽</span></div>
+            </div>
+        </div>
+        <div id="calcPortionPanel" style="display:none;">
+            <div class="form-group">
+                <label class="form-label">Название напитка</label>
+                <input type="text" class="form-input" id="portionName" placeholder="Например, Джим Бим">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Объём бутылки</label>
+                <div style="display:flex;gap:8px;">
+                    <input type="number" class="form-input" id="bottleVolume" placeholder="700" style="flex:2;">
+                    <select class="form-select" id="bottleUnit" style="flex:1;"><option value="ml">мл</option><option value="l">л</option></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Цена бутылки (₽)</label>
+                <input type="number" class="form-input" id="bottlePrice" placeholder="2500">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Размер порции (мл)</label>
+                <input type="number" class="form-input" id="portionSize" placeholder="50" oninput="calculatePortion()">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Количество порций</label>
+                <input type="number" class="form-input" id="portionCount" placeholder="1" oninput="calculatePortion()">
+            </div>
+            <button class="btn-primary" onclick="calculatePortion()">Рассчитать</button>
+            <div class="calc-result" id="portionResult" style="display:none;">
+                <div class="calc-result-row"><span class="calc-result-label">Всего порций из бутылки</span><span class="calc-result-value highlight" id="totalPortions">0</span></div>
+                <div class="calc-result-row"><span class="calc-result-label">Себестоимость порции</span><span class="calc-result-value" id="portionCost">0 ₽</span></div>
+                <div class="calc-result-row"><span class="calc-result-label">Остаток в бутылке</span><span class="calc-result-value" id="bottleRemainder">0 мл</span></div>
+                <div class="calc-result-row"><span class="calc-result-label">Доля бутылки</span><span class="calc-result-value" id="bottleFraction">0%</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section detail-view" id="detailView">
+        <button class="back-btn" onclick="closeDetail()">← Назад к списку</button>
+        <div id="detailContent"></div>
+    </div>
+
+    <button class="fab" id="fabBtn" onclick="openAddModal()" style="display:none;">+</button>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchSection('cocktails')"><span class="nav-icon">🍸</span><span>Техкарты</span></button>
+        <button class="nav-item" onclick="switchSection('knowledge')"><span class="nav-icon">📚</span><span>Знания</span></button>
+        <button class="nav-item" onclick="switchSection('calculator')"><span class="nav-icon">🧮</span><span>Калькулятор</span></button>
+    </nav>
+</div>
+
+<div class="modal-overlay" id="addModal">
+    <div class="modal">
+        <div class="modal-header"><div class="modal-title">Новая техкарта</div><button class="modal-close" onclick="closeAddModal()">×</button></div>
+        <div class="form-group"><label class="form-label">Название коктейля</label><input type="text" class="form-input" id="newName" placeholder="Например, Негрони"></div>
+        <div class="form-group"><label class="form-label">Категория</label><select class="form-select" id="newCategory"><option value="classic">Классика</option><option value="author">Авторский</option><option value="nonalco">Безалкогольный</option><option value="shot">Шот</option></select></div>
+        <div class="form-group"><label class="form-label">Техника приготовления</label><select class="form-select" id="newTechnique"><option value="shake">Shake (Шейк)</option><option value="stir">Stir (Стир)</option><option value="build">Build (Билд)</option><option value="blend">Blend (Бленд)</option><option value="muddle">Muddle (Мадл)</option><option value="layer">Layer (Лейринг)</option><option value="throw">Throw (Фроулинг)</option><option value="smoke">Smoke (Копчение)</option></select></div>
+        <div class="form-group"><label class="form-label">Посуда</label><select class="form-select" id="newGlass"><option value="rocks">Рокс (Old Fashioned)</option><option value="coupe">Купе</option><option value="highball">Хайбол</option><option value="collins">Коллинз</option><option value="flute">Флейта</option><option value="martini">Мартини</option><option value="tiki">Тики</option><option value="irish">Айриш кофе</option><option value="shot">Шот</option></select></div>
+        <div class="form-group"><label class="form-label">Лёд</label><select class="form-select" id="newIce"><option value="cube">Кубики</option><option value="crushed">Краш</option><option value="collins">Коллато</option><option value="sphere">Сфера</option><option value="none">Без льда</option></select></div>
+        <div class="form-group"><label class="form-label">Ингредиенты</label><div id="newIngredients"></div><button class="add-ingredient-btn" onclick="addNewIngredient()">+ Добавить ингредиент</button></div>
+        <div class="form-group"><label class="form-label">Технология приготовления</label><textarea class="form-textarea" id="newTech" placeholder="Пошаговое описание..."></textarea></div>
+        <div class="form-group"><label class="form-label">Гарнир / Декор</label><input type="text" class="form-input" id="newGarnish" placeholder="Апельсиновая цедра, вишня..."></div>
+        <div class="form-group"><label class="form-label">Себестоимость (₽)</label><input type="number" class="form-input" id="newCost" placeholder="150"></div>
+        <div class="form-group"><label class="form-label">Цена продажи (₽)</label><input type="number" class="form-input" id="newPrice" placeholder="450"></div>
+        <button class="btn-primary" onclick="saveCocktail()">Сохранить техкарту</button>
+    </div>
+</div>
+
+<script>
+let currentUser = null;
+let currentFilter = 'all';
+let cocktails = JSON.parse(localStorage.getItem('proofbook_cocktails')) || [];
+let currentCalcTab = 'cost';
+
+const knowledgeBase = [
+    {
+        category: "Техники приготовления",
+        items: [
+            {
+                title: "Shake (Шейк)",
+                preview: "Взбивание в шейкере — самый популярный метод",
+                detail: "<strong>Когда использовать:</strong> для коктейлей с соками, сиропами, яичным белком, сливками, фруктами.<br><br><strong>Техника:</strong><br>• Наполни шейкер льдом на 2/3<br>• Залей ингредиенты от менее крепкого к более крепкому<br>• Встряхивай энергично 10-15 секунд (до появления инея)<br>• Для яичного белка — dry shake (без льда) 15 сек, затем с льдом<br><br><strong>Примеры:</strong> Виски Сауэр, Космополитен, Дайкири, Маргарита"
+            },
+            {
+                title: "Stir (Стир)",
+                preview: "Перемешивание ложкой — для чистых крепких напитков",
+                detail: "<strong>Когда использовать:</strong> для коктейлей только из крепкого алкоголя и вермутов (без соков, сиропов).<br><br><strong>Техника:</strong><br>• Охлади смесительный стакан<br>• Наполни льдом на 2/3<br>• Влей ингредиенты<br>• Перемешивай барной ложкой 30-40 оборотов (≈20 сек)<br>• Стрейни в охлаждённый бокал<br><br><strong>Примеры:</strong> Мартини, Манхэттен, Негрони, Олд Фэшн"
+            },
+            {
+                title: "Build (Билд)",
+                preview: "Сборка прямо в бокале — просто и быстро",
+                detail: "<strong>Когда использовать:</strong> для коктейлей с газированными напитками, когда не нужно активное перемешивание.<br><br><strong>Техника:</strong><br>• Наполни бокал льдом<br>• Залей ингредиенты по порядку<br>• Аккуратно размешай барной ложкой (1-2 раза)<br>• Добавь газировку в конце<br>• Укрась<br><br><strong>Примеры:</strong> Кровавая Мэри, Апероль Шприц, Виски Кола, Мохито"
+            },
+            {
+                title: "Muddle (Мадл)",
+                preview: "Прессование ингредиентов для выделения аромата",
+                detail: "<strong>Когда использовать:</strong> для освежающих коктейлей с травами, фруктами, специями.<br><br><strong>Техника:</strong><br>• Положи ингредиенты в бокал<br>• Аккуратно придавли мадлером (не размалывай в кашу!)<br>• Добавь лёд и остальные ингредиенты<br>• Размешай<br><br><strong>Совет:</strong> Мяту давли лёгкими постукиваниями, цитрусы — круговыми движениями.<br><br><strong>Примеры:</strong> Мохито, Олд Фэшн, Кайпиринья, Сазерак"
+            },
+            {
+                title: "Layer (Лейринг)",
+                preview: "Наслаивание ингредиентов по плотности",
+                detail: "<strong>Когда использовать:</strong> для визуально эффектных шотов и десертных коктейлей.<br><br><strong>Техника:</strong><br>• Наливай ингредиенты по ложке на стенку бокала<br>• Самый плотный (сладкий) — снизу<br>• Самый лёгкий (крепкий) — сверху<br>• Не размешивай!<br><br><strong>Плотность (от тяжёлого к лёгкому):</strong><br>Сиропы → Ликёры → Крепкий алкоголь → Водка/джин<br><br><strong>Примеры:</strong> B-52, Облака, Пусс-кафе"
+            },
+            {
+                title: "Throw (Фроулинг)",
+                preview: "Переливание через воздух для аэрации",
+                detail: "<strong>Когда использовать:</strong> для коктейлей, которым нужна мягкая текстура и обогащение кислородом.<br><br><strong>Техника:</strong><br>• Налей напиток в один стакан (с льдом)<br>• Переливай на расстоянии вытянутых рук в другой стакан<br>• Повтори 3-5 раз<br>• Стрейни в бокал<br><br><strong>Rolling:</strong> то же самое, но без льда — для сохранения температуры.<br><br><strong>Примеры:</strong> Кокотка, некоторые вариации Мартини"
+            },
+            {
+                title: "Blend (Бленд)",
+                preview: "Измельчение в блендере — для frozen-коктейлей",
+                detail: "<strong>Когда использовать:</strong> для коктейлей с фруктами, молоком, большим количеством льда.<br><br><strong>Техника:</strong><br>• Положи все ингредиенты в чашу блендера<br>• Добавь лёд (обычно 1:1 к жидкости)<br>• Взбивай до однородной массы<br>• Подавай сразу<br><br><strong>Совет:</strong> Используй мякоть бананов, манго, клубники. Цитрусовые — только сок, не мякоть.<br><br><strong>Примеры:</strong> Пина Колада, Frozen Маргарита, Дайкири Фрозен"
+            },
+            {
+                title: "Smoke (Копчение)",
+                preview: "Дым для ароматизации коктейля",
+                detail: "<strong>Когда использовать:</strong> для создания глубокого, сложного аромата в крепких коктейлях.<br><br><strong>Техника:</strong><br>• Приготовь коктейль обычным способом<br>• Закрой бокал крышкой/блюдцем<br>• Подожги древесные щепки под бокалом<br>• Дай настояться 30-60 секунд<br>• Сними крышку и подавай<br><br><strong>Древесина:</strong> дуб, яблоня, вишня, пекан, кедр.<br><br><strong>Примеры:</strong> Smoked Олд Фэшн, Копчёный Негрони"
+            }
+        ]
+    },
+    {
+        category: "Посуда и лёд",
+        items: [
+            {
+                title: "Типы бокалов",
+                preview: "Какую посуду выбрать для каждого коктейля",
+                detail: "<strong>Рокс (Old Fashioned)</strong> — 180-300 мл. Низкий, широкий. Для крепких коктейлей со льдом: Олд Фэшн, Негрони, Виски Сауэр.<br><br><strong>Купе</strong> — 150-200 мл. Широкая чаша, низкая ножка. Для элегантных коктейлей: Космополитен, Дайкири.<br><br><strong>Хайбол</strong> — 240-350 мл. Высокий цилиндр. Для длинных напитков с газировкой: Куба Либре, Джин Тоник, Мохито.<br><br><strong>Коллинз</strong> — 300-400 мл. Высокий, узкий. Для коктейлей с большим количеством микса: Том Коллинз, Лонг Айленд.<br><br><strong>Флейта</strong> — 160-200 мл. Высокий, узкий. Для игристых вин и шампанских коктейлей: Беллини, Кир Рояль, Мимоза.<br><br><strong>Мартини</strong> — 150-200 мл. Коническая чаша. Для чистых крепких коктейлей: Мартини, Манхэттен, Гибсон.<br><br><strong>Тики</strong> — 300-500 мл. Экзотические формы. Для тропических коктейлей: Май Тай, Зомби, Пина Колада.<br><br><strong>Айриш кофе</strong> — 200-250 мл. С ручкой. Для горячих коктейлей: Айриш кофе, Грог, Глинтвейн."
+            },
+            {
+                title: "Виды льда",
+                preview: "Какой лёд для какого коктейля",
+                detail: "<strong>Кубики</strong> — универсальный вариант. Для шейка, стира, подачи в рокс.<br><br><strong>Краш (дроблёный)</strong> — для тропических коктейлей, Мохито, Кайпириньи. Быстро охлаждает и разбавляет.<br><br><strong>Коллато (коллинз)</strong> — длинные цилиндры для хайболов и коллинзов. Медленнее тают, меньше разбавляют.<br><br><strong>Сфера</strong> — для виски, крепких коктейлей в рокс. Тает медленнее всего, минимальное разбавление.<br><br><strong>Ледяная соль (пеллетс)</strong> — маленькие шарики. Для фрозен-коктейлей, быстрого охлаждения шотов.<br><br><strong>Копчёный лёд</strong> — замороженный с дымом. Для копчёных коктейлей.<br><br><strong>Правило:</strong> Чем больше лёд и чем плотнее — тем медленнее тает."
+            }
+        ]
+    },
+    {
+        category: "Ингредиенты и замены",
+        items: [
+            {
+                title: "Базовый барный набор",
+                preview: "Что должно быть на каждом баре",
+                detail: "<strong>Крепкий алкоголь:</strong> Водка, Джин, Ром (белый, тёмный), Текила, Виски (бурбон, шотландский), Коньяк/Бренди, Вермут (сладкий, сухой).<br><br><strong>Ликёры:</strong> Трипл Сек/Куантро, Амаретто, Калуа, Бейлис, Апероль, Кампари, Драмбуи.<br><br><strong>Сиропы:</strong> Сахарный, Гренадин, Мятный, Ванильный, Имбирный, Маракуйя.<br><br><strong>Соки и миксы:</strong> Апельсиновый, Клюквенный, Ананасовый, Томатный, Тоник, Содовая, Имбирное пиво.<br><br><strong>Дополнительно:</strong> Яичный белок, Сливки, Молоко, Мед, Сахар в кубиках, Соль, Перец чили, Ванильный стручок, Корица."
+            },
+            {
+                title: "Замены ингредиентов",
+                preview: "Чем заменить, если нет нужного",
+                detail: "<strong>Трипл Сек / Куантро</strong> → Любой апельсиновый ликёр (Cointreau, Grand Marnier, Curacao)<br><br><strong>Апероль</strong> → Кампари + капля сахарного сиропа (будет горче)<br><br><strong>Кампари</strong> → Апероль + пару капель ангостуры (будет мягче)<br><br><strong>Вермут</strong> → Лилле Блан (для белого), Пино (для красного)<br><br><strong>Гренадин</strong> → Сахарный сироп + гранатовый сок (1:1)<br><br><strong>Тоник</strong> → Содовая + щепотка хинина (если есть)<br><br><strong>Ангостура</strong> → Пейшо биттер, Оранж биттер (в зависимости от коктейля)<br><br><strong>Совет:</strong> Если нет точной замены — меняй профиль коктейля, а не пытайся скопировать вкус 1:1."
+            }
+        ]
+    },
+    {
+        category: "Барная дисциплина",
+        items: [
+            {
+                title: "Mise en place (Миз ан плас)",
+                preview: "Всё на своих местах — золотое правило бара",
+                detail: "<strong>Перед сменой:</strong><br>• Проверь остатки всех ингредиентов<br>• Достань всё, что понадобится, на рабочую поверхность<br>• Нарежь фрукты и цедру<br>• Подготовь гарниры<br>• Проверь лёд<br>• Протри посуду<br><br><strong>Во время смены:</strong><br>• Каждый ингредиент — на своём месте<br>• Использованное — сразу убирай<br>• Рабочая поверхность — чистая<br>• Полотенце — всегда под рукой<br><br><strong>После смены:</strong><br>• Помой всё оборудование<br>• Убери остатки<br>• Закрой все бутылки<br>• Протри барную стойку"
+            },
+            {
+                title: "Сроки хранения",
+                preview: "Сколько хранить открытые ингредиенты",
+                detail: "<strong>Крепкий алкоголь (40%+)</strong> — годами, пока крышка закрыта<br><br><strong>Вермуты, вина</strong> — 3-4 недели в холодильнике (окисляются!)<br><br><strong>Ликёры (20-30%)</strong> — 6-12 месяцев<br><br><strong>Сиропы домашние</strong> — 2-4 недели в холодильнике<br><br><strong>Сиропы покупные</strong> — до даты на упаковке (обычно 6-12 мес)<br><br><strong>Соки свежевыжатые</strong> — 24 часа в холодильнике<br><br><strong>Соки покупные (открытые)</strong> — 5-7 дней<br><br><strong>Сливки, молоко</strong> — по дате на упаковке, максимум 3 дня после вскрытия<br><br><strong>Яичный белок</strong> — 2-3 дня в холодильнике<br><br><strong>Мята, травы</strong> — 3-5 дней (в влажной бумаге)<br><br><strong>Цедра</strong> — 2-3 дня (в контейнере)<br><br><strong>Правило:</strong> Когда сомневаешься — понюхай. Плохой запах = выбросить."
+            },
+            {
+                title: "Правила подачи",
+                preview: "Как правильно подавать коктейль гостю",
+                detail: "<strong>Перед подачей:</strong><br>• Проверь внешний вид коктейля<br>• Убери капли с бокала<br>• Проверь гарнир — свежий, аккуратный<br>• Салфетка/подставка под бокал<br><br><strong>Подача:</strong><br>• Назови коктейль<br>• Кратко опиши состав (если авторский)<br>• Подай с улыбкой<br>• Полотенце рядом с бокалом<br><br><strong>Температура:</strong><br>• Крепкие коктейли — холодные, но не ледяные<br>• Тропические — максимально холодные<br>• Горячие — осторожно, предупреди гостя<br><br><strong>Этикет:</strong><br>• Никогда не касайся края бокала<br>• Бокал держи за ножку или дно<br>• Подавай справа от гостя"
+            }
+        ]
+    }
+];
+
+const BARMASTER_PIN = '1550';
+let pinInput = '';
+let pendingRole = null;
+
+function showPinInput(role) {
+    pendingRole = role;
+    pinInput = '';
+    document.getElementById('roleSelector').style.display = 'none';
+    document.getElementById('pinPanel').style.display = 'block';
+    document.getElementById('pinDisplay').textContent = '••••';
+    document.getElementById('pinError').classList.remove('show');
+}
+
+function pinPress(digit) {
+    if (pinInput.length < 4) {
+        pinInput += digit;
+        updatePinDisplay();
+        if (pinInput.length === 4) {
+            setTimeout(checkPin, 200);
+        }
+    }
+}
+
+function pinBackspace() {
+    pinInput = pinInput.slice(0, -1);
+    updatePinDisplay();
+    document.getElementById('pinError').classList.remove('show');
+}
+
+function pinCancel() {
+    pinInput = '';
+    pendingRole = null;
+    document.getElementById('pinPanel').style.display = 'none';
+    document.getElementById('roleSelector').style.display = 'flex';
+    document.getElementById('pinError').classList.remove('show');
+}
+
+function updatePinDisplay() {
+    const dots = '•'.repeat(pinInput.length) + '•'.repeat(4 - pinInput.length);
+    document.getElementById('pinDisplay').textContent = dots;
+}
+
+function checkPin() {
+    if (pinInput === BARMASTER_PIN) {
+        login('barmaster');
+        pinInput = '';
+        pendingRole = null;
+        document.getElementById('pinPanel').style.display = 'none';
+        document.getElementById('roleSelector').style.display = 'flex';
+    } else {
+        document.getElementById('pinError').classList.add('show');
+        pinInput = '';
+        setTimeout(updatePinDisplay, 300);
+    }
+}
+
+function login(role) {
+    currentUser = role;
+    localStorage.setItem('proofbook_user', role);
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appContainer').style.display = 'block';
+    document.getElementById('userRoleBadge').textContent = role === 'barmaster' ? 'BarMaster' : 'Bartender';
+
+    if (role === 'barmaster') {
+        document.getElementById('fabBtn').style.display = 'flex';
+        document.getElementById('calcTabs').style.display = 'flex';
+        document.getElementById('tabCost').style.display = 'block';
+        document.getElementById('tabPortion').style.display = 'block';
+    } else {
+        document.getElementById('fabBtn').style.display = 'none';
+        document.getElementById('calcTabs').style.display = 'none';
+        document.getElementById('calcCostPanel').style.display = 'none';
+        document.getElementById('calcPortionPanel').style.display = 'block';
+    }
+
+    renderCocktails();
+    renderKnowledgeBase();
+    initCalcIngredients();
+}
+
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('proofbook_user');
+    document.getElementById('appContainer').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('fabBtn').style.display = 'none';
+}
+
+if (localStorage.getItem('proofbook_user')) {
+    login(localStorage.getItem('proofbook_user'));
+}
+
+function switchSection(section) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('section' + section.charAt(0).toUpperCase() + section.slice(1)).classList.add('active');
+    event.currentTarget.classList.add('active');
+    document.getElementById('detailView').classList.remove('active');
+}
+
+const catNames = { classic: 'Классика', author: 'Авторский', nonalco: 'Безалкогольный', shot: 'Шот' };
+const techNames = { shake: 'Шейк', stir: 'Стир', build: 'Билд', blend: 'Бленд', muddle: 'Мадл', layer: 'Лейринг', throw: 'Фроулинг', smoke: 'Копчение' };
+const glassNames = { rocks: 'Рокс', coupe: 'Купе', highball: 'Хайбол', collins: 'Коллинз', flute: 'Флейта', martini: 'Мартини', tiki: 'Тики', irish: 'Айриш', shot: 'Шот' };
+const iceNames = { cube: 'Кубики', crushed: 'Краш', collins: 'Коллато', sphere: 'Сфера', none: 'Без льда' };
+
+function renderCocktails() {
+    const list = document.getElementById('cocktailsList');
+    const empty = document.getElementById('emptyCocktails');
+    const search = document.getElementById('cocktailSearch').value.toLowerCase();
+
+    let filtered = cocktails;
+    if (currentFilter !== 'all') {
+        filtered = filtered.filter(c => c.category === currentFilter);
+    }
+    if (search) {
+        filtered = filtered.filter(c => 
+            c.name.toLowerCase().includes(search) ||
+            c.ingredients.some(i => i.name.toLowerCase().includes(search))
+        );
+    }
+
+    if (filtered.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = cocktails.length === 0 ? 'block' : 'none';
+        if (cocktails.length > 0) {
+            list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-text">Ничего не найдено</div></div>';
+        }
+        return;
+    }
+
+    empty.style.display = 'none';
+    list.innerHTML = filtered.map((c, idx) => {
+        return '<div class="card" onclick="showDetail(' + idx + ')">' +
+            '<div class="card-title">' + c.name + '</div>' +
+            '<div class="card-meta">' +
+                '<span>' + (catNames[c.category] || c.category) + '</span>' +
+                '<span>' + (techNames[c.technique] || c.technique) + '</span>' +
+                '<span>' + (glassNames[c.glass] || c.glass) + '</span>' +
+            '</div>' +
+            '<div class="card-desc">' + c.ingredients.map(i => i.name).join(', ') + '</div>' +
+            (currentUser === 'barmaster' ? 
+                '<div class="card-actions" onclick="event.stopPropagation()">' +
+                    '<button class="btn-small" onclick="editCocktail(' + idx + ')">✏️ Редактировать</button>' +
+                    '<button class="btn-small danger" onclick="deleteCocktail(' + idx + ')">🗑️ Удалить</button>' +
+                '</div>' : '') +
+        '</div>';
+    }).join('');
+}
+
+function setFilter(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    renderCocktails();
+}
+
+function filterCocktails() {
+    renderCocktails();
+}
+
+function showDetail(idx) {
+    const c = cocktails[idx];
+    if (!c) return;
+
+    const foodCost = c.sellPrice > 0 ? ((c.cost / c.sellPrice) * 100).toFixed(1) : 0;
+
+    document.getElementById('detailContent').innerHTML = 
+        '<div class="detail-header"><div><div class="detail-title">' + c.name + '</div><span class="detail-category">' + (catNames[c.category] || c.category) + '</span></div></div>' +
+        '<div class="detail-section"><div class="detail-section-title">Ингредиенты</div><div class="detail-ingredients">' +
+            c.ingredients.map(i => '<div class="detail-ingredient"><span class="detail-ingredient-name">' + i.name + '</span><span class="detail-ingredient-amount">' + i.amount + ' ' + i.unit + '</span></div>').join('') +
+        '</div></div>' +
+        '<div class="detail-section"><div class="detail-section-title">Технология</div><div class="detail-tech">' + c.tech.replace(/\n/g, '<br>') + '</div></div>' +
+        '<div class="detail-section"><div class="detail-section-title">Параметры</div><div class="detail-meta-grid">' +
+            '<div class="detail-meta-item"><div class="detail-meta-label">Техника</div><div class="detail-meta-value">' + (techNames[c.technique] || c.technique) + '</div></div>' +
+            '<div class="detail-meta-item"><div class="detail-meta-label">Посуда</div><div class="detail-meta-value">' + (glassNames[c.glass] || c.glass) + '</div></div>' +
+            '<div class="detail-meta-item"><div class="detail-meta-label">Лёд</div><div class="detail-meta-value">' + (iceNames[c.ice] || c.ice) + '</div></div>' +
+            '<div class="detail-meta-item"><div class="detail-meta-label">Гарнир</div><div class="detail-meta-value">' + (c.garnish || '—') + '</div></div>' +
+        '</div></div>' +
+        '<div class="detail-section"><div class="detail-section-title">Экономика</div><div class="detail-meta-grid">' +
+            '<div class="detail-meta-item"><div class="detail-meta-label">Себестоимость</div><div class="detail-meta-value">' + (c.cost || 0) + ' ₽</div></div>' +
+            '<div class="detail-meta-item"><div class="detail-meta-label">Цена продажи</div><div class="detail-meta-value">' + (c.sellPrice || 0) + ' ₽</div></div>' +
+            '<div class="detail-meta-item"><div class="detail-meta-label">Food Cost</div><div class="detail-meta-value">' + foodCost + '%</div></div>' +
+            '<div class="detail-meta-item"><div class="detail-meta-label">Прибыль</div><div class="detail-meta-value">' + ((c.sellPrice - c.cost) || 0) + ' ₽</div></div>' +
+        '</div></div>';
+
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('detailView').classList.add('active');
+}
+
+function closeDetail() {
+    document.getElementById('detailView').classList.remove('active');
+    document.getElementById('sectionCocktails').classList.add('active');
+}
+
+let editingIdx = null;
+
+function openAddModal() {
+    editingIdx = null;
+    document.getElementById('addModal').classList.add('active');
+    document.querySelector('.modal-title').textContent = 'Новая техкарта';
+    clearForm();
+    addNewIngredient();
+}
+
+function closeAddModal() {
+    document.getElementById('addModal').classList.remove('active');
+}
+
+function clearForm() {
+    document.getElementById('newName').value = '';
+    document.getElementById('newCategory').value = 'classic';
+    document.getElementById('newTechnique').value = 'shake';
+    document.getElementById('newGlass').value = 'rocks';
+    document.getElementById('newIce').value = 'cube';
+    document.getElementById('newTech').value = '';
+    document.getElementById('newGarnish').value = '';
+    document.getElementById('newCost').value = '';
+    document.getElementById('newPrice').value = '';
+    document.getElementById('newIngredients').innerHTML = '';
+}
+
+function addNewIngredient() {
+    const container = document.getElementById('newIngredients');
+    const row = document.createElement('div');
+    row.className = 'ingredient-row';
+    row.innerHTML = '<input type="text" placeholder="Название" class="ing-name"><input type="text" placeholder="Кол-во" class="ing-amount"><input type="text" placeholder="Ед." class="ing-unit" value="мл"><button class="remove-ingredient" onclick="this.parentElement.remove()">×</button>';
+    container.appendChild(row);
+}
+
+function saveCocktail() {
+    const name = document.getElementById('newName').value.trim();
+    if (!name) { alert('Введите название коктейля'); return; }
+
+    const ingredients = [];
+    document.querySelectorAll('#newIngredients .ingredient-row').forEach(row => {
+        const name = row.querySelector('.ing-name').value.trim();
+        const amount = row.querySelector('.ing-amount').value.trim();
+        const unit = row.querySelector('.ing-unit').value.trim();
+        if (name && amount) {
+            ingredients.push({ name, amount, unit });
+        }
+    });
+
+    if (ingredients.length === 0) { alert('Добавьте хотя бы один ингредиент'); return; }
+
+    const cocktail = {
+        id: editingIdx !== null ? cocktails[editingIdx].id : Date.now(),
+        name: name,
+        category: document.getElementById('newCategory').value,
+        technique: document.getElementById('newTechnique').value,
+        glass: document.getElementById('newGlass').value,
+        ice: document.getElementById('newIce').value,
+        ingredients: ingredients,
+        tech: document.getElementById('newTech').value,
+        garnish: document.getElementById('newGarnish').value,
+        cost: parseFloat(document.getElementById('newCost').value) || 0,
+        sellPrice: parseFloat(document.getElementById('newPrice').value) || 0
+    };
+
+    if (editingIdx !== null) {
+        cocktails[editingIdx] = cocktail;
+    } else {
+        cocktails.push(cocktail);
+    }
+
+    localStorage.setItem('proofbook_cocktails', JSON.stringify(cocktails));
+    closeAddModal();
+    renderCocktails();
+}
+
+function editCocktail(idx) {
+    editingIdx = idx;
+    const c = cocktails[idx];
+    document.getElementById('newName').value = c.name;
+    document.getElementById('newCategory').value = c.category;
+    document.getElementById('newTechnique').value = c.technique;
+    document.getElementById('newGlass').value = c.glass;
+    document.getElementById('newIce').value = c.ice;
+    document.getElementById('newTech').value = c.tech;
+    document.getElementById('newGarnish').value = c.garnish || '';
+    document.getElementById('newCost').value = c.cost || '';
+    document.getElementById('newPrice').value = c.sellPrice || '';
+
+    document.getElementById('newIngredients').innerHTML = '';
+    c.ingredients.forEach(ing => {
+        const row = document.createElement('div');
+        row.className = 'ingredient-row';
+        row.innerHTML = '<input type="text" placeholder="Название" class="ing-name" value="' + ing.name + '"><input type="text" placeholder="Кол-во" class="ing-amount" value="' + ing.amount + '"><input type="text" placeholder="Ед." class="ing-unit" value="' + ing.unit + '"><button class="remove-ingredient" onclick="this.parentElement.remove()">×</button>';
+        document.getElementById('newIngredients').appendChild(row);
+    });
+
+    document.querySelector('.modal-title').textContent = 'Редактировать техкарту';
+    document.getElementById('addModal').classList.add('active');
+}
+
+function deleteCocktail(idx) {
+    if (confirm('Удалить техкарку "' + cocktails[idx].name + '"?')) {
+        cocktails.splice(idx, 1);
+        localStorage.setItem('proofbook_cocktails', JSON.stringify(cocktails));
+        renderCocktails();
+    }
+}
+
+function renderKnowledgeBase() {
+    const container = document.getElementById('kbContent');
+    const search = document.getElementById('kbSearch').value.toLowerCase();
+
+    let html = '';
+    knowledgeBase.forEach(cat => {
+        const filteredItems = cat.items.filter(item => 
+            !search || 
+            item.title.toLowerCase().includes(search) || 
+            item.preview.toLowerCase().includes(search) ||
+            item.detail.toLowerCase().includes(search)
+        );
+
+        if (filteredItems.length === 0) return;
+
+        html += '<div class="kb-category">';
+        html += '<div class="kb-category-title">' + cat.category + '</div>';
+
+        filteredItems.forEach(item => {
+            html += '<div class="kb-item" onclick="toggleKB(this)">' +
+                '<div class="kb-item-title">' + item.title + '</div>' +
+                '<div class="kb-item-preview">' + item.preview + '</div>' +
+                '<div class="kb-detail">' + item.detail + '</div>' +
+            '</div>';
+        });
+
+        html += '</div>';
+    });
+
+    container.innerHTML = html || '<div class="empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-text">Ничего не найдено</div></div>';
+}
+
+function toggleKB(element) {
+    element.classList.toggle('expanded');
+}
+
+function filterKB() {
+    renderKnowledgeBase();
+}
+
+function switchCalcTab(tab) {
+    currentCalcTab = tab;
+    document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab' + (tab === 'cost' ? 'Cost' : 'Portion')).classList.add('active');
+    document.getElementById('calcCostPanel').style.display = tab === 'cost' ? 'block' : 'none';
+    document.getElementById('calcPortionPanel').style.display = tab === 'portion' ? 'block' : 'none';
+}
+
+function initCalcIngredients() {
+    const container = document.getElementById('calcIngredients');
+    container.innerHTML = '';
+    addCalcIngredient();
+    addCalcIngredient();
+    addCalcIngredient();
+}
+
+function addCalcIngredient() {
+    const container = document.getElementById('calcIngredients');
+    const row = document.createElement('div');
+    row.className = 'calc-ingredient-row';
+    row.innerHTML = '<input type="text" placeholder="Ингредиент" class="calc-ing-name"><input type="number" placeholder="Кол-во" class="calc-ing-amount" oninput="calculateCost()"><input type="number" placeholder="Цена за ед." class="calc-ing-price" oninput="calculateCost()"><select class="unit-select"><option value="ml">мл</option><option value="g">г</option><option value="dash">dash</option><option value="drop">капля</option><option value="pc">шт</option></select><button class="remove-ingredient" onclick="this.parentElement.remove();calculateCost();">×</button>';
+    container.appendChild(row);
+}
+
+function calculateCost() {
+    const rows = document.querySelectorAll('#calcIngredients .calc-ingredient-row');
+    let totalCost = 0;
+
+    rows.forEach(row => {
+        const amount = parseFloat(row.querySelector('.calc-ing-amount').value) || 0;
+        const price = parseFloat(row.querySelector('.calc-ing-price').value) || 0;
+        totalCost += amount * price;
+    });
+
+    const sellPrice = parseFloat(document.getElementById('calcSellPrice').value) || 0;
+    const foodCost = sellPrice > 0 ? (totalCost / sellPrice * 100).toFixed(1) : 0;
+    const markup = totalCost > 0 ? ((sellPrice - totalCost) / totalCost * 100).toFixed(1) : 0;
+    const profit = sellPrice - totalCost;
+
+    document.getElementById('costPerPortion').textContent = totalCost.toFixed(2) + ' ₽';
+    document.getElementById('foodCostPercent').textContent = foodCost + '%';
+    document.getElementById('markupPercent').textContent = markup + '%';
+    document.getElementById('profitPerPortion').textContent = profit.toFixed(2) + ' ₽';
+    document.getElementById('costResult').style.display = 'block';
+}
+
+function calculatePortion() {
+    const volume = parseFloat(document.getElementById('bottleVolume').value) || 0;
+    const unit = document.getElementById('bottleUnit').value;
+    const bottlePrice = parseFloat(document.getElementById('bottlePrice').value) || 0;
+    const portionSize = parseFloat(document.getElementById('portionSize').value) || 0;
+    const portionCount = parseFloat(document.getElementById('portionCount').value) || 1;
+
+    const volumeMl = unit === 'l' ? volume * 1000 : volume;
+
+    if (volumeMl === 0 || portionSize === 0) {
+        document.getElementById('portionResult').style.display = 'none';
+        return;
+    }
+
+    const totalPortions = Math.floor(volumeMl / portionSize);
+    const portionCost = bottlePrice / totalPortions;
+    const neededMl = portionSize * portionCount;
+    const remainder = volumeMl - neededMl;
+    const fraction = (neededMl / volumeMl * 100).toFixed(1);
+
+    document.getElementById('totalPortions').textContent = totalPortions;
+    document.getElementById('portionCost').textContent = portionCost.toFixed(2) + ' ₽';
+    document.getElementById('bottleRemainder').textContent = remainder + ' мл';
+    document.getElementById('bottleFraction').textContent = fraction + '%';
+    document.getElementById('portionResult').style.display = 'block';
+}
+
+renderCocktails();
+renderKnowledgeBase();
+</script>
+
+</body>
+</html>
