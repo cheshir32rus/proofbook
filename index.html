@@ -148,6 +148,12 @@
         .hint-text { font-size:0.75rem; color:var(--text-muted); margin-top:4px; line-height:1.4; }
         .save-row { display:flex; gap:8px; margin-top:12px; }
         .save-row .btn-small { flex:1; }
+        
+        .pf-simple-table { width:100%; border-collapse:collapse; font-size:0.9rem; margin-top:8px; }
+        .pf-simple-table th { text-align:left; color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; padding:10px 8px; border-bottom:1px solid var(--border); }
+        .pf-simple-table td { padding:10px 8px; border-bottom:1px solid var(--border); }
+        .pf-simple-table tr:last-child td { border-bottom:none; }
+        .pf-simple-table .pf-total-need { color:var(--accent); font-weight:600; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -280,7 +286,7 @@
             </div>
         </div>
         
-        <!-- ТАБ 2: РАСЧЁТ П/Ф (ЗАКАЗ) -->
+        <!-- ТАБ 2: РАСЧЁТ П/Ф (ЗАКАЗ) — УПРОЩЁННЫЙ -->
         <div id="calcPortionPanel" style="display:none;">
             <div class="form-group">
                 <label class="form-label">Загрузить сохранённый рецепт</label>
@@ -294,11 +300,8 @@
                     <thead>
                         <tr>
                             <th>Ингредиент</th>
-                            <th style="min-width:65px;">На порцию</th>
-                            <th style="min-width:55px;">Ед.</th>
-                            <th style="min-width:75px;">Упаковка</th>
-                            <th style="min-width:55px;">Ед.</th>
-                            <th style="min-width:85px;">Цена упак. ₽</th>
+                            <th style="min-width:70px;">На порцию</th>
+                            <th style="min-width:60px;">Ед.</th>
                             <th style="width:36px;"></th>
                         </tr>
                     </thead>
@@ -312,11 +315,11 @@
                 <input type="number" class="form-input" id="pfPortionCount" value="1" min="1" oninput="calculatePortion()">
             </div>
             
-            <button class="btn-primary" onclick="calculatePortion()">Рассчитать заказ / п/ф</button>
+            <button class="btn-primary" onclick="calculatePortion()">Рассчитать заказ</button>
             
             <div class="calc-result" id="portionResult" style="display:none;">
+                <div class="section-subtitle" style="margin-bottom:12px;">Сколько продуктов нужно заказить:</div>
                 <div id="pfResultTable"></div>
-                <div class="pf-total">Общая сумма закупки: <b id="pfTotalCost">0 ₽</b></div>
             </div>
         </div>
     </div>
@@ -387,7 +390,7 @@ const knowledgeBase = [
             {
                 title: "Stir (Стир)",
                 preview: "Перемешивание ложкой — для чистых крепких напитков",
-                detail: "<strong>Когда использовать:</strong> для коктейлей только из крепкого алкоголя и вермутов (без соков, сиропов).<br><br><strong>Техника:</strong><br>• Охлади смесительный стакан<br>• Наполни льдом на 2/3<br>• Влей ингредиенты<br>• Перемешивай барной ложкой 30-40 оборотов (≈20 сек)<br>• Стрейни в охлаждённый бокал<br><br><strong>Примеры:</strong> Мартини, Манхэттен, Негрони, Олд Фэшн"
+                detail: "<strong>Когда использовать:</strong> для коктейлей только из крепкого алкоголя и вермутов (без соков, сиропов).<<br><br><strong>Техника:</strong><br>• Охлади смесительный стакан<br>• Наполни льдом на 2/3<br>• Влей ингредиенты<br>• Перемешивай барной ложкой 30-40 оборотов (≈20 сек)<br>• Стрейни в охлаждённый бокал<br><br><strong>Примеры:</strong> Мартини, Манхэттен, Негрони, Олд Фэшн"
             },
             {
                 title: "Build (Билд)",
@@ -397,7 +400,7 @@ const knowledgeBase = [
             {
                 title: "Muddle (Мадл)",
                 preview: "Прессование ингредиентов для выделения аромата",
-                detail: "<strong>Когда использовать:</strong> для освежающих коктейлей с травами, фруктами, специями.<br><br><strong>Техника:</strong><br>• Положи ингредиенты в бокал<br>• Аккуратно придавли мадлером (не размалывай в кашу!)<br>• Добавь лёд и остальные ингредиенты<br>• Размешай<br><br><strong>Совет:</strong> Мяту давли лёгкими постукиваниями, цитрусы — круговыми движениями.<br><br><strong>Примеры:</strong> Мохито, Олд Фэшн, Кайпиринья, Сазерак"
+                detail: "<strong>Когда использовать:</strong> для освежающих коктейлей с травами, фруктами, специями.<br><br><strong>Техника:</strong><br>• Положи ингредиенты в бокал<br>• Аккуратно придавли мадлером (не размалывай в кашу!)<<br>• Добавь лёд и остальные ингредиенты<br>• Размешай<br><br><strong>Совет:</strong> Мяту давли лёгкими постукиваниями, цитрусы — круговыми движениями.<br><br><strong>Примеры:</strong> Мохито, Олд Фэшн, Кайпиринья, Сазерак"
             },
             {
                 title: "Layer (Лейринг)",
@@ -442,7 +445,7 @@ const knowledgeBase = [
             {
                 title: "Базовый барный набор",
                 preview: "Что должно быть на каждом баре",
-                detail: "<strong>Крепкий алкоголь:</strong> Водка, Джин, Ром (белый, тёмный), Текила, Виски (бурбон, шотландский), Коньяк/Бренди, Вермут (сладкий, сухой).<br><br><strong>Ликёры:</strong> Трипл Сек/Куантро, Амаретто, Калуа, Бейлис, Апероль, Кампари, Драмбуи.<br><br><strong>Сиропы:</strong> Сахарный, Гренадин, Мятный, Ванильный, Имбирный, Маракуйя.<br><br><strong>Соки и миксы:</strong> Апельсиновый, Клюквенный, Ананасовый, Томатный, Тоник, Содовая, Имбирное пиво.<br><br><strong>Дополнительно:</strong> Яичный белок, Сливки, Молоко, Мед, Сахар в кубиках, Соль, Перец чили, Ванильный стручок, Корица."
+                detail: "<strong>Крепкий алкоголь:</strong> Водка, Джин, Ром (белый, тёмный), Текила, Виски (бурбон, шотландский), Коньяк/Бренди, Вермут (сладкий, сухой).<<br><br><strong>Ликёры:</strong> Трипл Сек/Куантро, Амаретто, Калуа, Бейлис, Апероль, Кампари, Драмбуи.<br><br><strong>Сиропы:</strong> Сахарный, Гренадин, Мятный, Ванильный, Имбирный, Маракуйя.<br><br><strong>Соки и миксы:</strong> Апельсиновый, Клюквенный, Ананасовый, Томатный, Тоник, Содовая, Имбирное пиво.<br><br><strong>Дополнительно:</strong> Яичный белок, Сливки, Молоко, Мед, Сахар в кубиках, Соль, Перец чили, Ванильный стручок, Корица."
             },
             {
                 title: "Замены ингредиентов",
@@ -462,7 +465,7 @@ const knowledgeBase = [
             {
                 title: "Сроки хранения",
                 preview: "Сколько хранить открытые ингредиенты",
-                detail: "<strong>Крепкий алкоголь (40%+)</strong> — годами, пока крышка закрыта<br><br><strong>Вермуты, вина</strong> — 3-4 недели в холодильнике (окисляются!)<br><br><strong>Ликёры (20-30%)</strong> — 6-12 месяцев<br><br><strong>Сиропы домашние</strong> — 2-4 недели в холодильнике<br><br><strong>Сиропы покупные</strong> — до даты на упаковке (обычно 6-12 мес)<br><br><strong>Соки свежевыжатые</strong> — 24 часа в холодильнике<br><br><strong>Соки покупные (открытые)</strong> — 5-7 дней<br><br><strong>Сливки, молоко</strong> — по дате на упаковке, максимум 3 дня после вскрытия<br><br><strong>Яичный белок</strong> — 2-3 дня в холодильнике<br><br><strong>Мята, травы</strong> — 3-5 дней (в влажной бумаге)<br><br><strong>Цедра</strong> — 2-3 дня (в контейнере)<br><br><strong>Правило:</strong> Когда сомневаешься — понюхай. Плохой запах = выбросить."
+                detail: "<strong>Крепкий алкоголь (40%+)</strong> — годами, пока крышка закрыта<br><br><strong>Вермуты, вина</strong> — 3-4 недели в холодильнике (окисляются!)<<br><br><strong>Ликёры (20-30%)</strong> — 6-12 месяцев<br><br><strong>Сиропы домашние</strong> — 2-4 недели в холодильнике<br><br><strong>Сиропы покупные</strong> — до даты на упаковке (обычно 6-12 мес)<br><br><strong>Соки свежевыжатые</strong> — 24 часа в холодильнике<br><br><strong>Соки покупные (открытые)</strong> — 5-7 дней<br><br><strong>Сливки, молоко</strong> — по дате на упаковке, максимум 3 дня после вскрытия<br><br><strong>Яичный белок</strong> — 2-3 дня в холодильнике<br><br><strong>Мята, травы</strong> — 3-5 дней (в влажной бумаге)<br><br><strong>Цедра</strong> — 2-3 дня (в контейнере)<br><br><strong>Правило:</strong> Когда сомневаешься — понюхай. Плохой запах = выбросить."
             },
             {
                 title: "Правила подачи",
@@ -918,9 +921,6 @@ function addPfRow(data) {
         '<td><input type="text" class="pf-name" placeholder="Виски" value="' + (d.name||'') + '" oninput="calculatePortion()"></td>' +
         '<td><input type="number" class="pf-qty" placeholder="50" value="' + (d.qty||'') + '" oninput="calculatePortion()"></td>' +
         '<td>' + unitSelect('pf-unit', d.unit, 'calculatePortion()') + '</td>' +
-        '<td><input type="number" class="pf-pack" placeholder="700" value="' + (d.pack||'') + '" oninput="calculatePortion()"></td>' +
-        '<td>' + unitSelect('pf-pack-unit', d.packUnit, 'calculatePortion()', true) + '</td>' +
-        '<td><input type="number" class="pf-price" placeholder="2500" value="' + (d.price||'') + '" oninput="calculatePortion()"></td>' +
         '<td><button class="remove-ingredient" onclick="this.closest(\'tr\').remove();calculatePortion();">×</button></td>';
     tbody.appendChild(tr);
 }
@@ -1037,7 +1037,7 @@ function loadPfRecipe() {
     if (!recipe) return;
     
     document.getElementById('pfTableBody').innerHTML = '';
-    recipe.ingredients.forEach(ing => addPfRow(ing));
+    recipe.ingredients.forEach(ing => addPfRow({ name: ing.name, qty: ing.qty, unit: ing.unit }));
     calculatePortion();
 }
 
@@ -1054,47 +1054,31 @@ function calculatePortion() {
         return;
     }
     
-    let html = '<table class="calc-table" style="margin-bottom:8px;"><thead><tr><th>Ингредиент</th><th>На 1 порц.</th><th>Всего нужно</th><th>Упаковка</th><th>Нужно упак.</th><th>Цена упак.</th><th>Сумма</th></tr></thead><tbody>';
-    let totalCost = 0;
+    let html = '<table class="pf-simple-table"><thead><tr><th>Ингредиент</th><th>На 1 порц.</th><th>Всего нужно</th></tr></thead><tbody>';
     
     rows.forEach(row => {
         const name = row.querySelector('.pf-name').value || '—';
         const qty = parseFloat(row.querySelector('.pf-qty').value) || 0;
         const unit = row.querySelector('.pf-unit').value;
-        const pack = parseFloat(row.querySelector('.pf-pack').value) || 0;
-        const packUnit = row.querySelector('.pf-pack-unit').value;
-        const price = parseFloat(row.querySelector('.pf-price').value) || 0;
         
-        const qtyBase = toBase(qty, unit);
-        const packBase = toBase(pack, packUnit);
+        const total = qty * count;
         
-        const totalQty = qty * count;
-        const totalQtyBase = qtyBase * count;
-        const packsNeeded = packBase > 0 ? Math.ceil(totalQtyBase / packBase) : 0;
-        const sum = packsNeeded * price;
-        totalCost += sum;
-        
-        let totalQtyDisplay = totalQty;
+        let totalDisplay = total;
         let totalUnit = unit;
-        if (unit === 'ml' && totalQty >= 1000) { totalQtyDisplay = (totalQty/1000).toFixed(2); totalUnit = 'л'; }
-        if (unit === 'g' && totalQty >= 1000) { totalQtyDisplay = (totalQty/1000).toFixed(2); totalUnit = 'кг'; }
-        if (unit === 'l') { totalQtyDisplay = totalQty.toFixed(2); totalUnit = 'л'; }
-        if (unit === 'kg') { totalQtyDisplay = totalQty.toFixed(2); totalUnit = 'кг'; }
+        if (unit === 'ml' && total >= 1000) { totalDisplay = (total/1000).toFixed(2); totalUnit = 'л'; }
+        if (unit === 'g' && total >= 1000) { totalDisplay = (total/1000).toFixed(2); totalUnit = 'кг'; }
+        if (unit === 'l') { totalDisplay = total.toFixed(2); totalUnit = 'л'; }
+        if (unit === 'kg') { totalDisplay = total.toFixed(2); totalUnit = 'кг'; }
         
         html += '<tr>' +
             '<td>' + name + '</td>' +
             '<td>' + qty + ' ' + unit + '</td>' +
-            '<td style="color:var(--accent-light);font-weight:500;">' + totalQtyDisplay + ' ' + totalUnit + '</td>' +
-            '<td>' + pack + ' ' + packUnit + '</td>' +
-            '<td style="color:var(--accent);font-weight:600;">' + packsNeeded + '</td>' +
-            '<td>' + price + ' ₽</td>' +
-            '<td>' + sum.toFixed(2) + ' ₽</td>' +
+            '<td class="pf-total-need">' + totalDisplay + ' ' + totalUnit + '</td>' +
         '</tr>';
     });
     
     html += '</tbody></table>';
     document.getElementById('pfResultTable').innerHTML = html;
-    document.getElementById('pfTotalCost').textContent = totalCost.toFixed(2) + ' ₽';
     document.getElementById('portionResult').style.display = 'block';
 }
 
