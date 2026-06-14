@@ -31,6 +31,8 @@
         .app-header .user-role { font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; background:var(--bg-card); padding:4px 12px; border-radius:20px; border:1px solid var(--border); }
         .logout-btn { background:none; border:1px solid var(--border); color:var(--text-secondary); padding:6px 14px; border-radius:20px; font-size:0.75rem; cursor:pointer; transition:all 0.2s; }
         .logout-btn:hover { border-color:var(--accent); color:var(--accent); }
+        .theme-toggle { background:none; border:1px solid var(--border); color:var(--text-secondary); padding:6px 12px; border-radius:20px; font-size:0.85rem; cursor:pointer; transition:all 0.2s; }
+        .theme-toggle:hover { border-color:var(--accent); color:var(--accent); }
         .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(26,15,10,0.95); backdrop-filter:blur(20px); border-top:1px solid var(--border); display:flex; justify-content:space-around; padding:8px 0 20px; z-index:100; }
         .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 16px; cursor:pointer; color:var(--text-muted); transition:all 0.2s; border:none; background:none; font-family:inherit; font-size:0.65rem; text-transform:uppercase; letter-spacing:1px; }
         .nav-item.active { color:var(--accent); }
@@ -154,6 +156,196 @@
         .pf-simple-table td { padding:10px 8px; border-bottom:1px solid var(--border); }
         .pf-simple-table tr:last-child td { border-bottom:none; }
         .pf-simple-table .pf-total-need { color:var(--accent); font-weight:600; }
+
+        /* ===================== LIGHT THEME ===================== */
+        body.light-theme {
+            --bg-dark: #f5f0e8;
+            --bg-card: rgba(255, 252, 247, 0.92);
+            --bg-card-hover: rgba(255, 250, 242, 0.96);
+            --accent: #a67c52;
+            --accent-light: #8b6239;
+            --accent-glow: rgba(166, 124, 82, 0.12);
+            --text-primary: #2c1810;
+            --text-secondary: #5c4a3d;
+            --text-muted: #9e8e7e;
+            --border: rgba(166, 124, 82, 0.18);
+            --danger: #c44;
+            --success: #4a8;
+            --glass: rgba(255, 252, 247, 0.85);
+            --glass-border: rgba(166, 124, 82, 0.15);
+        }
+        body.light-theme::before {
+            background: radial-gradient(ellipse at 20% 50%, rgba(166,124,82,0.04) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 20%, rgba(166,124,82,0.03) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 80%, rgba(200,160,100,0.04) 0%, transparent 50%);
+        }
+        body.light-theme .app-header,
+        body.light-theme .bottom-nav {
+            background: rgba(245, 240, 232, 0.95);
+            border-color: rgba(166, 124, 82, 0.15);
+        }
+        body.light-theme .login-screen {
+            background: #f5f0e8;
+        }
+        body.light-theme .logo {
+            color: #8b6239;
+            text-shadow: 0 0 40px rgba(166,124,82,0.2);
+        }
+        body.light-theme .logo-subtitle {
+            color: var(--text-secondary);
+        }
+        body.light-theme .role-btn {
+            background: rgba(255,252,247,0.9);
+            border-color: rgba(166,124,82,0.2);
+        }
+        body.light-theme .role-btn .role-title {
+            color: var(--accent-light);
+        }
+        body.light-theme .role-btn .role-desc {
+            color: var(--text-muted);
+        }
+        body.light-theme .card,
+        body.light-theme .kb-item,
+        body.light-theme .calc-result,
+        body.light-theme .detail-ingredients,
+        body.light-theme .detail-tech,
+        body.light-theme .detail-meta-item,
+        body.light-theme .search-box,
+        body.light-theme .form-input,
+        body.light-theme .form-select,
+        body.light-theme .form-textarea,
+        body.light-theme .calc-table input,
+        body.light-theme .calc-table select,
+        body.light-theme .pin-key {
+            background: rgba(255,252,247,0.9);
+            border-color: rgba(166,124,82,0.2);
+            color: var(--text-primary);
+        }
+        body.light-theme .card:hover,
+        body.light-theme .kb-item:hover,
+        body.light-theme .pin-key:hover {
+            background: var(--bg-card-hover);
+        }
+        body.light-theme .filter-tag {
+            background: rgba(255,252,247,0.9);
+            border-color: rgba(166,124,82,0.2);
+            color: var(--text-secondary);
+        }
+        body.light-theme .filter-tag.active {
+            background: var(--accent);
+            color: #fff;
+        }
+        body.light-theme .nav-item.active {
+            color: var(--accent);
+        }
+        body.light-theme .btn-small {
+            background: rgba(166,124,82,0.08);
+            border-color: rgba(166,124,82,0.2);
+            color: var(--accent);
+        }
+        body.light-theme .btn-small.danger {
+            background: rgba(204,68,68,0.08);
+            border-color: rgba(204,68,68,0.2);
+        }
+        body.light-theme .add-ingredient-btn {
+            background: rgba(166,124,82,0.05);
+            border-color: rgba(166,124,82,0.2);
+            color: var(--accent);
+        }
+        body.light-theme .modal {
+            background: #f5f0e8;
+            border-color: rgba(166,124,82,0.2);
+        }
+        body.light-theme .modal-close {
+            color: var(--text-muted);
+        }
+        body.light-theme .modal-close:hover {
+            color: var(--accent);
+        }
+        body.light-theme ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+        body.light-theme ::-webkit-scrollbar-thumb {
+            background: rgba(166,124,82,0.3);
+        }
+        body.light-theme .empty-state {
+            color: var(--text-muted);
+        }
+        body.light-theme .hint-text {
+            color: var(--text-muted);
+        }
+        body.light-theme .pf-simple-table th,
+        body.light-theme .calc-table th {
+            color: var(--text-muted);
+            border-color: var(--border);
+        }
+        body.light-theme .pf-simple-table td,
+        body.light-theme .calc-table td {
+            border-color: var(--border);
+        }
+        body.light-theme .section-subtitle {
+            color: var(--text-muted);
+        }
+        body.light-theme .back-btn {
+            background: rgba(255,252,247,0.9);
+            border-color: rgba(166,124,82,0.2);
+            color: var(--text-secondary);
+        }
+        body.light-theme .back-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        body.light-theme .user-role {
+            background: rgba(255,252,247,0.9);
+            border-color: rgba(166,124,82,0.2);
+            color: var(--text-muted);
+        }
+        body.light-theme .logout-btn {
+            border-color: rgba(166,124,82,0.2);
+            color: var(--text-secondary);
+        }
+        body.light-theme .logout-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        body.light-theme .theme-toggle {
+            border-color: rgba(166,124,82,0.2);
+            color: var(--text-secondary);
+        }
+        body.light-theme .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        body.light-theme .app-header .logo-small {
+            color: var(--accent);
+        }
+        body.light-theme .ingredient-row input {
+            background: rgba(255,252,247,0.9);
+            border-color: rgba(166,124,82,0.2);
+            color: var(--text-primary);
+        }
+        body.light-theme .remove-ingredient {
+            background: rgba(204,68,68,0.08);
+            border-color: rgba(204,68,68,0.2);
+        }
+        body.light-theme .calc-result {
+            background: rgba(255,252,247,0.9);
+            border-color: rgba(166,124,82,0.2);
+        }
+        body.light-theme .calc-result-row {
+            border-color: var(--border);
+        }
+        body.light-theme .detail-section-title {
+            color: var(--accent);
+        }
+        body.light-theme .kb-category-title {
+            border-color: var(--border);
+            color: var(--accent);
+        }
+        body.light-theme .kb-detail {
+            border-color: var(--border);
+            color: var(--text-secondary);
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -202,6 +394,7 @@
     <header class="app-header">
         <div class="logo-small">ProofBook</div>
         <div style="display:flex;align-items:center;gap:12px;">
+            <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="Сменить тему">☀️</button>
             <span class="user-role" id="userRoleBadge">Bartender</span>
             <button class="logout-btn" onclick="logout()">Выйти</button>
         </div>
@@ -240,7 +433,6 @@
             <div class="calc-tab" onclick="switchCalcTab('portion')" id="tabPortion">Расчёт п/ф</div>
         </div>
         
-        <!-- ТАБ 1: СЕБЕСТОИМОСТЬ ПОРЦИИ -->
         <div id="calcCostPanel">
             <div class="form-group">
                 <label class="form-label">Название коктейля / напитка</label>
@@ -286,7 +478,6 @@
             </div>
         </div>
         
-        <!-- ТАБ 2: РАСЧЁТ П/Ф (ЗАКАЗ) — УПРОЩЁННЫЙ -->
         <div id="calcPortionPanel" style="display:none;">
             <div class="form-group">
                 <label class="form-label">Загрузить сохранённый рецепт</label>
@@ -329,7 +520,7 @@
         <div id="detailContent"></div>
     </div>
 
-    <button class="fab" id="fabBtn" onclick="openAddModal()" style="display:none;">+</button>
+    <button class="fab" id="fabBtn" style="display:none;">+</button>
 
     <nav class="bottom-nav">
         <button class="nav-item active" onclick="switchSection('cocktails')"><span class="nav-icon">🍸</span><span>Техкарты</span></button>
@@ -340,7 +531,7 @@
 
 <div class="modal-overlay" id="addModal">
     <div class="modal">
-        <div class="modal-header"><div class="modal-title">Новая техкарта</div><button class="modal-close" onclick="closeAddModal()">×</button></div>
+        <div class="modal-header"><div class="modal-title" id="cocktailModalTitle">Новая техкарта</div><button class="modal-close" onclick="closeAddModal()">×</button></div>
         <div class="form-group"><label class="form-label">Название коктейля</label><input type="text" class="form-input" id="newName" placeholder="Например, Негрони"></div>
         <div class="form-group"><label class="form-label">Категория</label><select class="form-select" id="newCategory"><option value="classic">Классика</option><option value="author">Авторский</option><option value="nonalco">Безалкогольный</option><option value="shot">Шот</option></select></div>
         <div class="form-group"><label class="form-label">Техника приготовления</label><select class="form-select" id="newTechnique"><option value="shake">Shake (Шейк)</option><option value="stir">Stir (Стир)</option><option value="build">Build (Билд)</option><option value="blend">Blend (Бленд)</option><option value="muddle">Muddle (Мадл)</option><option value="layer">Layer (Лейринг)</option><option value="throw">Throw (Фроулинг)</option><option value="smoke">Smoke (Копчение)</option></select></div>
@@ -355,8 +546,35 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="knowledgeModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title" id="knowledgeModalTitle">Новая статья</div>
+            <button class="modal-close" onclick="closeKnowledgeModal()">×</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Категория</label>
+            <input type="text" class="form-input" id="kbEditCategory" list="kbCategories" placeholder="Например, Техники приготовления">
+            <datalist id="kbCategories"></datalist>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Название</label>
+            <input type="text" class="form-input" id="kbEditTitle" placeholder="Название статьи">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Краткое описание</label>
+            <input type="text" class="form-input" id="kbEditPreview" placeholder="Одно предложение...">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Полный текст</label>
+            <textarea class="form-textarea" id="kbEditDetail" rows="8" placeholder="Полное описание. Можно использовать HTML теги (<strong>, <br>, <ul>...)"></textarea>
+            <div class="hint-text">Поддерживаются HTML-теги для форматирования</div>
+        </div>
+        <button class="btn-primary" onclick="saveKnowledge()">Сохранить статью</button>
+    </div>
+</div>
+
 <script>
-// ===================== FIREBASE CONFIG =====================
 const firebaseConfig = {
   apiKey: "AIzaSyB1tGzwlXIjymsvyYXSTM2wei3uEdOR8I",
   authDomain: "proofbook-dacha.firebaseapp.com",
@@ -378,7 +596,11 @@ let currentFilter = 'all';
 let cocktails = JSON.parse(localStorage.getItem('proofbook_cocktails')) || [];
 let currentCalcTab = 'cost';
 
-const knowledgeBase = [
+const BARMASTER_PIN = '1550';
+let pinInput = '';
+let pendingRole = null;
+
+const defaultKnowledgeBase = [
     {
         category: "Техники приготовления",
         items: [
@@ -390,7 +612,7 @@ const knowledgeBase = [
             {
                 title: "Stir (Стир)",
                 preview: "Перемешивание ложкой — для чистых крепких напитков",
-                detail: "<strong>Когда использовать:</strong> для коктейлей только из крепкого алкоголя и вермутов (без соков, сиропов).<<br><br><strong>Техника:</strong><br>• Охлади смесительный стакан<br>• Наполни льдом на 2/3<br>• Влей ингредиенты<br>• Перемешивай барной ложкой 30-40 оборотов (≈20 сек)<br>• Стрейни в охлаждённый бокал<br><br><strong>Примеры:</strong> Мартини, Манхэттен, Негрони, Олд Фэшн"
+                detail: "<strong>Когда использовать:</strong> для коктейлей только из крепкого алкоголя и вермутов (без соков, сиропов).<br><br><strong>Техника:</strong><br>• Охлади смесительный стакан<br>• Наполни льдом на 2/3<br>• Влей ингредиенты<br>• Перемешивай барной ложкой 30-40 оборотов (≈20 сек)<br>• Стрейни в охлаждённый бокал<br><br><strong>Примеры:</strong> Мартини, Манхэттен, Негрони, Олд Фэшн"
             },
             {
                 title: "Build (Билд)",
@@ -400,7 +622,7 @@ const knowledgeBase = [
             {
                 title: "Muddle (Мадл)",
                 preview: "Прессование ингредиентов для выделения аромата",
-                detail: "<strong>Когда использовать:</strong> для освежающих коктейлей с травами, фруктами, специями.<br><br><strong>Техника:</strong><br>• Положи ингредиенты в бокал<br>• Аккуратно придавли мадлером (не размалывай в кашу!)<<br>• Добавь лёд и остальные ингредиенты<br>• Размешай<br><br><strong>Совет:</strong> Мяту давли лёгкими постукиваниями, цитрусы — круговыми движениями.<br><br><strong>Примеры:</strong> Мохито, Олд Фэшн, Кайпиринья, Сазерак"
+                detail: "<strong>Когда использовать:</strong> для освежающих коктейлей с травами, фруктами, специями.<br><br><strong>Техника:</strong><br>• Положи ингредиенты в бокал<br>• Аккуратно придавли мадлером (не размалывай в кашу!)<br>• Добавь лёд и остальные ингредиенты<br>• Размешай<br><br><strong>Совет:</strong> Мяту давли лёгкими постукиваниями, цитрусы — круговыми движениями.<br><br><strong>Примеры:</strong> Мохито, Олд Фэшн, Кайпиринья, Сазерак"
             },
             {
                 title: "Layer (Лейринг)",
@@ -445,7 +667,7 @@ const knowledgeBase = [
             {
                 title: "Базовый барный набор",
                 preview: "Что должно быть на каждом баре",
-                detail: "<strong>Крепкий алкоголь:</strong> Водка, Джин, Ром (белый, тёмный), Текила, Виски (бурбон, шотландский), Коньяк/Бренди, Вермут (сладкий, сухой).<<br><br><strong>Ликёры:</strong> Трипл Сек/Куантро, Амаретто, Калуа, Бейлис, Апероль, Кампари, Драмбуи.<br><br><strong>Сиропы:</strong> Сахарный, Гренадин, Мятный, Ванильный, Имбирный, Маракуйя.<br><br><strong>Соки и миксы:</strong> Апельсиновый, Клюквенный, Ананасовый, Томатный, Тоник, Содовая, Имбирное пиво.<br><br><strong>Дополнительно:</strong> Яичный белок, Сливки, Молоко, Мед, Сахар в кубиках, Соль, Перец чили, Ванильный стручок, Корица."
+                detail: "<strong>Крепкий алкоголь:</strong> Водка, Джин, Ром (белый, тёмный), Текила, Виски (бурбон, шотландский), Коньяк/Бренди, Вермут (сладкий, сухой).<br><br><strong>Ликёры:</strong> Трипл Сек/Куантро, Амаретто, Калуа, Бейлис, Апероль, Кампари, Драмбуи.<br><br><strong>Сиропы:</strong> Сахарный, Гренадин, Мятный, Ванильный, Имбирный, Маракуйя.<br><br><strong>Соки и миксы:</strong> Апельсиновый, Клюквенный, Ананасовый, Томатный, Тоник, Содовая, Имбирное пиво.<br><br><strong>Дополнительно:</strong> Яичный белок, Сливки, Молоко, Мед, Сахар в кубиках, Соль, Перец чили, Ванильный стручок, Корица."
             },
             {
                 title: "Замены ингредиентов",
@@ -465,7 +687,7 @@ const knowledgeBase = [
             {
                 title: "Сроки хранения",
                 preview: "Сколько хранить открытые ингредиенты",
-                detail: "<strong>Крепкий алкоголь (40%+)</strong> — годами, пока крышка закрыта<br><br><strong>Вермуты, вина</strong> — 3-4 недели в холодильнике (окисляются!)<<br><br><strong>Ликёры (20-30%)</strong> — 6-12 месяцев<br><br><strong>Сиропы домашние</strong> — 2-4 недели в холодильнике<br><br><strong>Сиропы покупные</strong> — до даты на упаковке (обычно 6-12 мес)<br><br><strong>Соки свежевыжатые</strong> — 24 часа в холодильнике<br><br><strong>Соки покупные (открытые)</strong> — 5-7 дней<br><br><strong>Сливки, молоко</strong> — по дате на упаковке, максимум 3 дня после вскрытия<br><br><strong>Яичный белок</strong> — 2-3 дня в холодильнике<br><br><strong>Мята, травы</strong> — 3-5 дней (в влажной бумаге)<br><br><strong>Цедра</strong> — 2-3 дня (в контейнере)<br><br><strong>Правило:</strong> Когда сомневаешься — понюхай. Плохой запах = выбросить."
+                detail: "<strong>Крепкий алкоголь (40%+)</strong> — годами, пока крышка закрыта<br><br><strong>Вермуты, вина</strong> — 3-4 недели в холодильнике (окисляются!)<br><br><strong>Ликёры (20-30%)</strong> — 6-12 месяцев<br><br><strong>Сиропы домашние</strong> — 2-4 недели в холодильнике<br><br><strong>Сиропы покупные</strong> — до даты на упаковке (обычно 6-12 мес)<br><br><strong>Соки свежевыжатые</strong> — 24 часа в холодильнике<br><br><strong>Соки покупные (открытые)</strong> — 5-7 дней<br><br><strong>Сливки, молоко</strong> — по дате на упаковке, максимум 3 дня после вскрытия<br><br><strong>Яичный белок</strong> — 2-3 дня в холодильнике<br><br><strong>Мята, травы</strong> — 3-5 дней (в влажной бумаге)<br><br><strong>Цедра</strong> — 2-3 дня (в контейнере)<br><br><strong>Правило:</strong> Когда сомневаешься — понюхай. Плохой запах = выбросить."
             },
             {
                 title: "Правила подачи",
@@ -476,9 +698,8 @@ const knowledgeBase = [
     }
 ];
 
-const BARMASTER_PIN = '1550';
-let pinInput = '';
-let pendingRole = null;
+let knowledgeData = [];
+let editingKnowledgeId = null;
 
 function showPinInput(role) {
     pendingRole = role;
@@ -540,13 +761,11 @@ function login(role) {
     document.getElementById('userRoleBadge').textContent = role === 'barmaster' ? 'BarMaster' : 'Bartender';
 
     if (role === 'barmaster') {
-        document.getElementById('fabBtn').style.display = 'flex';
         document.getElementById('calcTabs').style.display = 'flex';
         document.getElementById('tabCost').style.display = 'block';
         document.getElementById('tabPortion').style.display = 'block';
         switchCalcTab('cost');
     } else {
-        document.getElementById('fabBtn').style.display = 'none';
         document.getElementById('calcTabs').style.display = 'flex';
         document.getElementById('tabCost').style.display = 'none';
         document.getElementById('tabPortion').style.display = 'block';
@@ -554,8 +773,9 @@ function login(role) {
     }
 
     loadCocktailsFromFirebase();
-    renderKnowledgeBase();
-    initCalc();
+    loadKnowledgeFromFirebase();
+    applyTheme();
+    updateFab();
 }
 
 function logout() {
@@ -576,6 +796,27 @@ function switchSection(section) {
     document.getElementById('section' + section.charAt(0).toUpperCase() + section.slice(1)).classList.add('active');
     event.currentTarget.classList.add('active');
     document.getElementById('detailView').classList.remove('active');
+    updateFab();
+}
+
+function updateFab() {
+    const fab = document.getElementById('fabBtn');
+    if (currentUser !== 'barmaster') {
+        fab.style.display = 'none';
+        return;
+    }
+    const activeSection = document.querySelector('.section.active');
+    if (!activeSection) return;
+    
+    if (activeSection.id === 'sectionCocktails') {
+        fab.style.display = 'flex';
+        fab.onclick = openAddModal;
+    } else if (activeSection.id === 'sectionKnowledge') {
+        fab.style.display = 'flex';
+        fab.onclick = openKnowledgeModal;
+    } else {
+        fab.style.display = 'none';
+    }
 }
 
 const catNames = { classic: 'Классика', author: 'Авторский', nonalco: 'Безалкогольный', shot: 'Шот' };
@@ -583,7 +824,6 @@ const techNames = { shake: 'Шейк', stir: 'Стир', build: 'Билд', blen
 const glassNames = { rocks: 'Рокс', coupe: 'Купе', highball: 'Хайбол', collins: 'Коллинз', flute: 'Флейта', martini: 'Мартини', tiki: 'Тики', irish: 'Айриш', shot: 'Шот' };
 const iceNames = { cube: 'Кубики', crushed: 'Краш', collins: 'Коллато', sphere: 'Сфера', none: 'Без льда' };
 
-// ===================== FIREBASE SYNC =====================
 function loadCocktailsFromFirebase() {
     db.collection('cocktails').onSnapshot(snapshot => {
         cocktails = [];
@@ -723,7 +963,7 @@ let editingId = null;
 function openAddModal() {
     editingId = null;
     document.getElementById('addModal').classList.add('active');
-    document.querySelector('.modal-title').textContent = 'Новая техкарта';
+    document.getElementById('cocktailModalTitle').textContent = 'Новая техкарта';
     clearForm();
     addNewIngredient();
 }
@@ -814,7 +1054,7 @@ function editCocktail(id) {
         document.getElementById('newIngredients').appendChild(row);
     });
 
-    document.querySelector('.modal-title').textContent = 'Редактировать техкарту';
+    document.getElementById('cocktailModalTitle').textContent = 'Редактировать техкарту';
     document.getElementById('addModal').classList.add('active');
 }
 
@@ -836,34 +1076,114 @@ function deleteCocktail(id) {
     }
 }
 
+function loadKnowledgeFromFirebase() {
+    db.collection('knowledge').onSnapshot(snapshot => {
+        knowledgeData = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            data.id = doc.id;
+            knowledgeData.push(data);
+        });
+        localStorage.setItem('proofbook_knowledge', JSON.stringify(knowledgeData));
+        renderKnowledgeBase();
+        updateKBCategoriesDatalist();
+    }, err => {
+        console.log('KB Firebase error, using local:', err);
+        knowledgeData = JSON.parse(localStorage.getItem('proofbook_knowledge') || '[]');
+        if (knowledgeData.length === 0) {
+            initDefaultKnowledge();
+        }
+        renderKnowledgeBase();
+        updateKBCategoriesDatalist();
+    });
+}
+
+function initDefaultKnowledge() {
+    const defaults = [];
+    defaultKnowledgeBase.forEach(cat => {
+        cat.items.forEach(item => {
+            defaults.push({
+                category: cat.category,
+                title: item.title,
+                preview: item.preview,
+                detail: item.detail,
+                updatedAt: new Date().toISOString()
+            });
+        });
+    });
+    knowledgeData = defaults;
+    localStorage.setItem('proofbook_knowledge', JSON.stringify(knowledgeData));
+    if (navigator.onLine) {
+        defaults.forEach(item => {
+            db.collection('knowledge').add(item).catch(e => console.log('Default KB sync error:', e));
+        });
+    }
+}
+
+function saveKnowledgeToFirebase(item) {
+    if (!navigator.onLine) {
+        alert('Нет интернета. Статья сохранена локально, синхронизируется при подключении.');
+        return Promise.resolve();
+    }
+    if (item.id && typeof item.id === 'string' && item.id.length > 10) {
+        const id = item.id;
+        delete item.id;
+        return db.collection('knowledge').doc(id).set(item);
+    } else {
+        delete item.id;
+        return db.collection('knowledge').add(item);
+    }
+}
+
+function deleteKnowledgeFromFirebase(id) {
+    if (!navigator.onLine) {
+        alert('Нет интернета. Удаление произойдёт при подключении.');
+        return Promise.resolve();
+    }
+    return db.collection('knowledge').doc(id).delete();
+}
+
 function renderKnowledgeBase() {
     const container = document.getElementById('kbContent');
     const search = document.getElementById('kbSearch').value.toLowerCase();
 
+    const grouped = {};
+    knowledgeData.forEach(item => {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push(item);
+    });
+
     let html = '';
-    knowledgeBase.forEach(cat => {
-        const filteredItems = cat.items.filter(item => 
+    for (const [catName, items] of Object.entries(grouped)) {
+        const filteredItems = items.filter(item => 
             !search || 
             item.title.toLowerCase().includes(search) || 
             item.preview.toLowerCase().includes(search) ||
-            item.detail.toLowerCase().includes(search)
+            (item.detail && item.detail.toLowerCase().includes(search))
         );
-
-        if (filteredItems.length === 0) return;
+        if (filteredItems.length === 0) continue;
 
         html += '<div class="kb-category">';
-        html += '<div class="kb-category-title">' + cat.category + '</div>';
-
+        html += '<div class="kb-category-title">' + catName + '</div>';
         filteredItems.forEach(item => {
             html += '<div class="kb-item" onclick="toggleKB(this)">' +
-                '<div class="kb-item-title">' + item.title + '</div>' +
-                '<div class="kb-item-preview">' + item.preview + '</div>' +
-                '<div class="kb-detail">' + item.detail + '</div>' +
+                '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">' +
+                    '<div style="flex:1;min-width:0;">' +
+                        '<div class="kb-item-title">' + item.title + '</div>' +
+                        '<div class="kb-item-preview">' + item.preview + '</div>' +
+                    '</div>';
+            if (currentUser === 'barmaster') {
+                html += '<div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px;" onclick="event.stopPropagation()">' +
+                    '<button class="btn-small" onclick="editKnowledge(\'' + item.id + '\')">✏️</button>' +
+                    '<button class="btn-small danger" onclick="deleteKnowledge(\'' + item.id + '\')">🗑️</button>' +
+                '</div>';
+            }
+            html += '</div>' +
+                '<div class="kb-detail">' + (item.detail || '') + '</div>' +
             '</div>';
         });
-
         html += '</div>';
-    });
+    }
 
     container.innerHTML = html || '<div class="empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-text">Ничего не найдено</div></div>';
 }
@@ -876,7 +1196,101 @@ function filterKB() {
     renderKnowledgeBase();
 }
 
-// ===================== КАЛЬКУЛЯТОР =====================
+function openKnowledgeModal() {
+    editingKnowledgeId = null;
+    document.getElementById('knowledgeModalTitle').textContent = 'Новая статья';
+    document.getElementById('kbEditCategory').value = '';
+    document.getElementById('kbEditTitle').value = '';
+    document.getElementById('kbEditPreview').value = '';
+    document.getElementById('kbEditDetail').value = '';
+    document.getElementById('knowledgeModal').classList.add('active');
+}
+
+function closeKnowledgeModal() {
+    document.getElementById('knowledgeModal').classList.remove('active');
+}
+
+function editKnowledge(id) {
+    const item = knowledgeData.find(x => x.id === id);
+    if (!item) return;
+    editingKnowledgeId = id;
+    document.getElementById('knowledgeModalTitle').textContent = 'Редактировать статью';
+    document.getElementById('kbEditCategory').value = item.category || '';
+    document.getElementById('kbEditTitle').value = item.title || '';
+    document.getElementById('kbEditPreview').value = item.preview || '';
+    document.getElementById('kbEditDetail').value = item.detail || '';
+    document.getElementById('knowledgeModal').classList.add('active');
+}
+
+function saveKnowledge() {
+    const category = document.getElementById('kbEditCategory').value.trim();
+    const title = document.getElementById('kbEditTitle').value.trim();
+    const preview = document.getElementById('kbEditPreview').value.trim();
+    const detail = document.getElementById('kbEditDetail').value.trim();
+
+    if (!category) { alert('Введите категорию'); return; }
+    if (!title) { alert('Введите название'); return; }
+    if (!preview) { alert('Введите краткое описание'); return; }
+    if (!detail) { alert('Введите полный текст'); return; }
+
+    const item = {
+        id: editingKnowledgeId,
+        category: category,
+        title: title,
+        preview: preview,
+        detail: detail,
+        updatedAt: new Date().toISOString()
+    };
+
+    saveKnowledgeToFirebase(item).then(() => {
+        closeKnowledgeModal();
+    }).catch(err => {
+        console.error('KB save error:', err);
+        alert('Ошибка сохранения. Проверьте интернет.');
+    });
+}
+
+function deleteKnowledge(id) {
+    const item = knowledgeData.find(x => x.id === id);
+    if (!item) return;
+    if (confirm('Удалить статью "' + item.title + '"?')) {
+        if (id && typeof id === 'string' && id.length > 10) {
+            deleteKnowledgeFromFirebase(id).catch(err => {
+                console.error('KB delete error:', err);
+                alert('Ошибка удаления. Проверьте интернет.');
+            });
+        } else {
+            knowledgeData = knowledgeData.filter(x => x.id !== id);
+            localStorage.setItem('proofbook_knowledge', JSON.stringify(knowledgeData));
+            renderKnowledgeBase();
+            updateKBCategoriesDatalist();
+        }
+    }
+}
+
+function updateKBCategoriesDatalist() {
+    const datalist = document.getElementById('kbCategories');
+    const categories = [...new Set(knowledgeData.map(k => k.category))];
+    datalist.innerHTML = categories.map(c => '<option value="' + c + '">').join('');
+}
+
+function toggleTheme() {
+    document.body.classList.toggle('light-theme');
+    const isLight = document.body.classList.contains('light-theme');
+    localStorage.setItem('proofbook_theme', isLight ? 'light' : 'dark');
+    const btn = document.getElementById('themeBtn');
+    if (btn) btn.textContent = isLight ? '🌙' : '☀️';
+}
+
+function applyTheme() {
+    const saved = localStorage.getItem('proofbook_theme');
+    if (saved === 'light') {
+        document.body.classList.add('light-theme');
+        const btn = document.getElementById('themeBtn');
+        if (btn) btn.textContent = '🌙';
+    }
+}
+
 function switchCalcTab(tab) {
     currentCalcTab = tab;
     document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
