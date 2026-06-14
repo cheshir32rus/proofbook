@@ -124,71 +124,33 @@
         .back-btn:hover { border-color:var(--accent); color:var(--accent); }
         @media(min-width:768px){ .section{padding:30px} .card{padding:24px} }
         ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:var(--bg-dark)} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px} ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
-        .calc-ingredient-row { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 40px; gap:6px; margin-bottom:6px; align-items:center; }
-        .calc-ingredient-row input,.calc-ingredient-row select { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--text-primary); font-family:inherit; font-size:0.8rem; outline:none; }
-        .calc-ingredient-row input:focus,.calc-ingredient-row select:focus { border-color:var(--accent); }
-        .calc-ingredient-row select { cursor:pointer; }
-    
-        .pin-panel {
-            animation: fadeIn 0.3s ease;
-        }
-        .pin-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
-            color: var(--accent-light);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .pin-display {
-            font-size: 2.5rem;
-            color: var(--accent);
-            letter-spacing: 12px;
-            text-align: center;
-            margin-bottom: 24px;
-            font-weight: 600;
-            min-height: 3rem;
-        }
-        .pin-error {
-            color: var(--danger);
-            font-size: 0.85rem;
-            text-align: center;
-            margin-bottom: 16px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
+        
+        .calc-table { width:100%; border-collapse:collapse; margin-bottom:8px; font-size:0.85rem; }
+        .calc-table th { text-align:left; color:var(--text-muted); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; padding:8px 4px; border-bottom:1px solid var(--border); white-space:nowrap; }
+        .calc-table td { padding:4px; vertical-align:middle; }
+        .calc-table input, .calc-table select { width:100%; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:10px 8px; color:var(--text-primary); font-family:inherit; font-size:0.85rem; outline:none; }
+        .calc-table input:focus, .calc-table select:focus { border-color:var(--accent); }
+        .calc-table .row-cost { color:var(--accent); font-weight:600; text-align:center; font-size:0.85rem; }
+        .pf-total { margin-top:16px; padding-top:16px; border-top:2px solid var(--accent); text-align:right; font-size:1.1rem; color:var(--accent-light); }
+        .pf-total b { color:var(--accent); font-size:1.3rem; }
+        
+        .pin-panel { animation: fadeIn 0.3s ease; }
+        .pin-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--accent-light); margin-bottom: 20px; text-align: center; }
+        .pin-display { font-size: 2.5rem; color: var(--accent); letter-spacing: 12px; text-align: center; margin-bottom: 24px; font-weight: 600; min-height: 3rem; }
+        .pin-error { color: var(--danger); font-size: 0.85rem; text-align: center; margin-bottom: 16px; opacity: 0; transition: opacity 0.2s; }
         .pin-error.show { opacity: 1; }
-        .pin-keypad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-        .pin-key {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            color: var(--text-primary);
-            font-size: 1.4rem;
-            font-family: inherit;
-            padding: 18px 0;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .pin-key:hover {
-            border-color: var(--accent);
-            background: var(--bg-card-hover);
-        }
-        .pin-key:active {
-            transform: scale(0.95);
-            background: rgba(201, 169, 110, 0.1);
-        }
-        .pin-key-action {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-        }
+        .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .pin-key { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; color: var(--text-primary); font-size: 1.4rem; font-family: inherit; padding: 18px 0; cursor: pointer; transition: all 0.15s; }
+        .pin-key:hover { border-color: var(--accent); background: var(--bg-card-hover); }
+        .pin-key:active { transform: scale(0.95); background: rgba(201, 169, 110, 0.1); }
+        .pin-key-action { color: var(--text-secondary); font-size: 1.2rem; }
+        
+        .hint-text { font-size:0.75rem; color:var(--text-muted); margin-top:4px; line-height:1.4; }
+        .save-row { display:flex; gap:8px; margin-top:12px; }
+        .save-row .btn-small { flex:1; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<base target="_blank">
 </head>
 <body>
 
@@ -205,7 +167,7 @@
         <div class="role-btn" onclick="login('bartender')">
             <span class="role-icon">🥃</span>
             <div class="role-title">Bartender</div>
-            <div class="role-desc">Просмотр: техкарты, база знаний, калькулятор</div>
+            <div class="role-desc">Просмотр: техкарты, база знаний, калькулятор п/ф</div>
         </div>
     </div>
 
@@ -266,63 +228,95 @@
 
     <div class="section" id="sectionCalculator">
         <div class="section-title">Калькулятор</div>
-        <div class="section-subtitle">Себестоимость и порции</div>
+        <div class="section-subtitle">Себестоимость и расчёт п/ф</div>
         <div class="calc-tabs" id="calcTabs">
             <div class="calc-tab active" onclick="switchCalcTab('cost')" id="tabCost">Себестоимость</div>
-            <div class="calc-tab" onclick="switchCalcTab('portion')" id="tabPortion">Порции</div>
+            <div class="calc-tab" onclick="switchCalcTab('portion')" id="tabPortion">Расчёт п/ф</div>
         </div>
+        
+        <!-- ТАБ 1: СЕБЕСТОИМОСТЬ ПОРЦИИ -->
         <div id="calcCostPanel">
             <div class="form-group">
-                <label class="form-label">Название коктейля</label>
-                <input type="text" class="form-input" id="calcCocktailName" placeholder="Например, Олд Фэшн">
+                <label class="form-label">Название коктейля / напитка</label>
+                <input type="text" class="form-input" id="calcName" placeholder="Например, Олд Фэшн">
             </div>
-            <div class="form-group">
-                <label class="form-label">Ингредиенты</label>
-                <div id="calcIngredients"></div>
-                <button class="add-ingredient-btn" onclick="addCalcIngredient()">+ Добавить ингредиент</button>
+            
+            <div style="overflow-x:auto;">
+                <table class="calc-table" id="costTable">
+                    <thead>
+                        <tr>
+                            <th>Ингредиент</th>
+                            <th style="min-width:65px;">Кол-во</th>
+                            <th style="min-width:55px;">Ед.</th>
+                            <th style="min-width:75px;">Упаковка</th>
+                            <th style="min-width:55px;">Ед.</th>
+                            <th style="min-width:85px;">Цена упак. ₽</th>
+                            <th style="min-width:75px;">В порции ₽</th>
+                            <th style="width:36px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="costTableBody"></tbody>
+                </table>
             </div>
-            <div class="form-group">
+            <button class="add-ingredient-btn" onclick="addCostRow()">+ Добавить ингредиент</button>
+            
+            <div class="form-group" style="margin-top:16px;">
                 <label class="form-label">Цена продажи (₽)</label>
                 <input type="number" class="form-input" id="calcSellPrice" placeholder="450" oninput="calculateCost()">
             </div>
-            <button class="btn-primary" onclick="calculateCost()">Рассчитать</button>
+            
+            <button class="btn-primary" onclick="calculateCost()">Рассчитать себестоимость</button>
+            
             <div class="calc-result" id="costResult" style="display:none;">
                 <div class="calc-result-row"><span class="calc-result-label">Себестоимость порции</span><span class="calc-result-value highlight" id="costPerPortion">0 ₽</span></div>
                 <div class="calc-result-row"><span class="calc-result-label">Food Cost %</span><span class="calc-result-value" id="foodCostPercent">0%</span></div>
-                <div class="calc-result-row"><span class="calc-result-label">Наценка</span><span class="calc-result-value" id="markupPercent">0%</span></div>
+                <div class="calc-result-row"><span class="calc-result-label">Наценка</span><span class="calc-result-value" id="markupPercentCalc">0%</span></div>
                 <div class="calc-result-row"><span class="calc-result-label">Прибыль на порцию</span><span class="calc-result-value" id="profitPerPortion">0 ₽</span></div>
             </div>
+            
+            <div class="save-row">
+                <button class="btn-small" onclick="saveCalcRecipe()" style="flex:1;">💾 Сохранить рецепт</button>
+                <button class="btn-small danger" onclick="clearCalcForm()" style="flex:1;">Очистить</button>
+            </div>
         </div>
+        
+        <!-- ТАБ 2: РАСЧЁТ П/Ф (ЗАКАЗ) -->
         <div id="calcPortionPanel" style="display:none;">
             <div class="form-group">
-                <label class="form-label">Название напитка</label>
-                <input type="text" class="form-input" id="portionName" placeholder="Например, Джим Бим">
+                <label class="form-label">Загрузить сохранённый рецепт</label>
+                <select class="form-select" id="pfRecipeSelect" onchange="loadPfRecipe()">
+                    <option value="">-- Ввести вручную --</option>
+                </select>
             </div>
-            <div class="form-group">
-                <label class="form-label">Объём бутылки</label>
-                <div style="display:flex;gap:8px;">
-                    <input type="number" class="form-input" id="bottleVolume" placeholder="700" style="flex:2;">
-                    <select class="form-select" id="bottleUnit" style="flex:1;"><option value="ml">мл</option><option value="l">л</option></select>
-                </div>
+            
+            <div style="overflow-x:auto;">
+                <table class="calc-table" id="pfTable">
+                    <thead>
+                        <tr>
+                            <th>Ингредиент</th>
+                            <th style="min-width:65px;">На порцию</th>
+                            <th style="min-width:55px;">Ед.</th>
+                            <th style="min-width:75px;">Упаковка</th>
+                            <th style="min-width:55px;">Ед.</th>
+                            <th style="min-width:85px;">Цена упак. ₽</th>
+                            <th style="width:36px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="pfTableBody"></tbody>
+                </table>
             </div>
-            <div class="form-group">
-                <label class="form-label">Цена бутылки (₽)</label>
-                <input type="number" class="form-input" id="bottlePrice" placeholder="2500">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Размер порции (мл)</label>
-                <input type="number" class="form-input" id="portionSize" placeholder="50" oninput="calculatePortion()">
-            </div>
-            <div class="form-group">
+            <button class="add-ingredient-btn" onclick="addPfRow()">+ Добавить позицию</button>
+            
+            <div class="form-group" style="margin-top:16px;">
                 <label class="form-label">Количество порций</label>
-                <input type="number" class="form-input" id="portionCount" placeholder="1" oninput="calculatePortion()">
+                <input type="number" class="form-input" id="pfPortionCount" value="1" min="1" oninput="calculatePortion()">
             </div>
-            <button class="btn-primary" onclick="calculatePortion()">Рассчитать</button>
+            
+            <button class="btn-primary" onclick="calculatePortion()">Рассчитать заказ / п/ф</button>
+            
             <div class="calc-result" id="portionResult" style="display:none;">
-                <div class="calc-result-row"><span class="calc-result-label">Всего порций из бутылки</span><span class="calc-result-value highlight" id="totalPortions">0</span></div>
-                <div class="calc-result-row"><span class="calc-result-label">Себестоимость порции</span><span class="calc-result-value" id="portionCost">0 ₽</span></div>
-                <div class="calc-result-row"><span class="calc-result-label">Остаток в бутылке</span><span class="calc-result-value" id="bottleRemainder">0 мл</span></div>
-                <div class="calc-result-row"><span class="calc-result-label">Доля бутылки</span><span class="calc-result-value" id="bottleFraction">0%</span></div>
+                <div id="pfResultTable"></div>
+                <div class="pf-total">Общая сумма закупки: <b id="pfTotalCost">0 ₽</b></div>
             </div>
         </div>
     </div>
@@ -369,11 +363,9 @@ const firebaseConfig = {
   appId: "1:494287550883:web:ec2b57cc2564c4cd948216"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Enable offline persistence
 db.enablePersistence({ synchronizeTabs: true }).catch(err => {
   console.log('Persistence error:', err);
 });
@@ -549,17 +541,18 @@ function login(role) {
         document.getElementById('calcTabs').style.display = 'flex';
         document.getElementById('tabCost').style.display = 'block';
         document.getElementById('tabPortion').style.display = 'block';
+        switchCalcTab('cost');
     } else {
         document.getElementById('fabBtn').style.display = 'none';
-        document.getElementById('calcTabs').style.display = 'none';
-        document.getElementById('calcCostPanel').style.display = 'none';
-        document.getElementById('calcPortionPanel').style.display = 'block';
+        document.getElementById('calcTabs').style.display = 'flex';
+        document.getElementById('tabCost').style.display = 'none';
+        document.getElementById('tabPortion').style.display = 'block';
+        switchCalcTab('portion');
     }
 
-    // Load cocktails from Firebase
     loadCocktailsFromFirebase();
     renderKnowledgeBase();
-    initCalcIngredients();
+    initCalc();
 }
 
 function logout() {
@@ -596,12 +589,10 @@ function loadCocktailsFromFirebase() {
             data.id = doc.id;
             cocktails.push(data);
         });
-        // Also save to localStorage for offline
         localStorage.setItem('proofbook_cocktails', JSON.stringify(cocktails));
         renderCocktails();
     }, err => {
         console.log('Firebase error, using local:', err);
-        // Fallback to localStorage if offline
         cocktails = JSON.parse(localStorage.getItem('proofbook_cocktails')) || [];
         renderCocktails();
     });
@@ -614,12 +605,10 @@ function saveCocktailToFirebase(cocktail) {
     }
 
     if (cocktail.id && typeof cocktail.id === 'string' && cocktail.id.length > 10) {
-        // Update existing
         const id = cocktail.id;
         delete cocktail.id;
         return db.collection('cocktails').doc(id).set(cocktail);
     } else {
-        // Add new
         delete cocktail.id;
         return db.collection('cocktails').add(cocktail);
     }
@@ -659,8 +648,8 @@ function renderCocktails() {
     }
 
     empty.style.display = 'none';
-    list.innerHTML = filtered.map((c, idx) => {
-        return '<div class="card" onclick="showDetail(' + idx + ')">' +
+    list.innerHTML = filtered.map(c => {
+        return '<div class="card" onclick="showDetail(\'' + c.id + '\')">' +
             '<div class="card-title">' + c.name + '</div>' +
             '<div class="card-meta">' +
                 '<span>' + (catNames[c.category] || c.category) + '</span>' +
@@ -670,8 +659,8 @@ function renderCocktails() {
             '<div class="card-desc">' + c.ingredients.map(i => i.name).join(', ') + '</div>' +
             (currentUser === 'barmaster' ? 
                 '<div class="card-actions" onclick="event.stopPropagation()">' +
-                    '<button class="btn-small" onclick="editCocktail(' + idx + ')">✏️ Редактировать</button>' +
-                    '<button class="btn-small danger" onclick="deleteCocktail(' + idx + ')">🗑️ Удалить</button>' +
+                    '<button class="btn-small" onclick="editCocktail(\'' + c.id + '\')">✏️ Редактировать</button>' +
+                    '<button class="btn-small danger" onclick="deleteCocktail(\'' + c.id + '\')">🗑️ Удалить</button>' +
                 '</div>' : '') +
         '</div>';
     }).join('');
@@ -688,11 +677,20 @@ function filterCocktails() {
     renderCocktails();
 }
 
-function showDetail(idx) {
-    const c = cocktails[idx];
+function showDetail(id) {
+    const c = cocktails.find(x => x.id === id);
     if (!c) return;
 
-    const foodCost = c.sellPrice > 0 ? ((c.cost / c.sellPrice) * 100).toFixed(1) : 0;
+    let economicsHTML = '';
+    if (currentUser === 'barmaster') {
+        const foodCost = c.sellPrice > 0 ? ((c.cost / c.sellPrice) * 100).toFixed(1) : 0;
+        economicsHTML = '<div class="detail-section"><div class="detail-section-title">Экономика</div><div class="detail-meta-grid">' +
+            '<div class="detail-meta-item"><div class="detail-meta-label">Себестоимость</div><div class="detail-meta-value">' + (c.cost || 0) + ' ₽</div></div>' +
+            '<div class="detail-meta-item"><div class="detail-meta-label">Цена продажи</div><div class="detail-meta-value">' + (c.sellPrice || 0) + ' ₽</div></div>' +
+            '<div class="detail-meta-item"><div class="detail-meta-label">Food Cost</div><div class="detail-meta-value">' + foodCost + '%</div></div>' +
+            '<div class="detail-meta-item"><div class="detail-meta-label">Прибыль</div><div class="detail-meta-value">' + ((c.sellPrice - c.cost) || 0) + ' ₽</div></div>' +
+        '</div></div>';
+    }
 
     document.getElementById('detailContent').innerHTML = 
         '<div class="detail-header"><div><div class="detail-title">' + c.name + '</div><span class="detail-category">' + (catNames[c.category] || c.category) + '</span></div></div>' +
@@ -706,12 +704,7 @@ function showDetail(idx) {
             '<div class="detail-meta-item"><div class="detail-meta-label">Лёд</div><div class="detail-meta-value">' + (iceNames[c.ice] || c.ice) + '</div></div>' +
             '<div class="detail-meta-item"><div class="detail-meta-label">Гарнир</div><div class="detail-meta-value">' + (c.garnish || '—') + '</div></div>' +
         '</div></div>' +
-        '<div class="detail-section"><div class="detail-section-title">Экономика</div><div class="detail-meta-grid">' +
-            '<div class="detail-meta-item"><div class="detail-meta-label">Себестоимость</div><div class="detail-meta-value">' + (c.cost || 0) + ' ₽</div></div>' +
-            '<div class="detail-meta-item"><div class="detail-meta-label">Цена продажи</div><div class="detail-meta-value">' + (c.sellPrice || 0) + ' ₽</div></div>' +
-            '<div class="detail-meta-item"><div class="detail-meta-label">Food Cost</div><div class="detail-meta-value">' + foodCost + '%</div></div>' +
-            '<div class="detail-meta-item"><div class="detail-meta-label">Прибыль</div><div class="detail-meta-value">' + ((c.sellPrice - c.cost) || 0) + ' ₽</div></div>' +
-        '</div></div>';
+        economicsHTML;
 
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById('detailView').classList.add('active');
@@ -722,10 +715,10 @@ function closeDetail() {
     document.getElementById('sectionCocktails').classList.add('active');
 }
 
-let editingIdx = null;
+let editingId = null;
 
 function openAddModal() {
-    editingIdx = null;
+    editingId = null;
     document.getElementById('addModal').classList.add('active');
     document.querySelector('.modal-title').textContent = 'Новая техкарта';
     clearForm();
@@ -774,7 +767,7 @@ function saveCocktail() {
     if (ingredients.length === 0) { alert('Добавьте хотя бы один ингредиент'); return; }
 
     const cocktail = {
-        id: editingIdx !== null ? cocktails[editingIdx].id : null,
+        id: editingId,
         name: name,
         category: document.getElementById('newCategory').value,
         technique: document.getElementById('newTechnique').value,
@@ -790,16 +783,16 @@ function saveCocktail() {
 
     saveCocktailToFirebase(cocktail).then(() => {
         closeAddModal();
-        // renderCocktails will be called by onSnapshot listener
     }).catch(err => {
         console.error('Save error:', err);
         alert('Ошибка сохранения. Проверьте интернет.');
     });
 }
 
-function editCocktail(idx) {
-    editingIdx = idx;
-    const c = cocktails[idx];
+function editCocktail(id) {
+    const c = cocktails.find(x => x.id === id);
+    if (!c) return;
+    editingId = id;
     document.getElementById('newName').value = c.name;
     document.getElementById('newCategory').value = c.category;
     document.getElementById('newTechnique').value = c.technique;
@@ -822,18 +815,18 @@ function editCocktail(idx) {
     document.getElementById('addModal').classList.add('active');
 }
 
-function deleteCocktail(idx) {
-    if (confirm('Удалить техкарку "' + cocktails[idx].name + '"?')) {
-        const id = cocktails[idx].id;
+function deleteCocktail(id) {
+    const c = cocktails.find(x => x.id === id);
+    if (!c) return;
+    if (confirm('Удалить техкарку "' + c.name + '"?')) {
         if (id && typeof id === 'string' && id.length > 10) {
             deleteCocktailFromFirebase(id).then(() => {
-                // renderCocktails will be called by onSnapshot listener
             }).catch(err => {
                 console.error('Delete error:', err);
                 alert('Ошибка удаления. Проверьте интернет.');
             });
         } else {
-            cocktails.splice(idx, 1);
+            cocktails = cocktails.filter(x => x.id !== id);
             localStorage.setItem('proofbook_cocktails', JSON.stringify(cocktails));
             renderCocktails();
         }
@@ -880,6 +873,7 @@ function filterKB() {
     renderKnowledgeBase();
 }
 
+// ===================== КАЛЬКУЛЯТОР =====================
 function switchCalcTab(tab) {
     currentCalcTab = tab;
     document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
@@ -888,68 +882,219 @@ function switchCalcTab(tab) {
     document.getElementById('calcPortionPanel').style.display = tab === 'portion' ? 'block' : 'none';
 }
 
-function initCalcIngredients() {
-    const container = document.getElementById('calcIngredients');
-    container.innerHTML = '';
-    addCalcIngredient();
-    addCalcIngredient();
-    addCalcIngredient();
+function initCalc() {
+    document.getElementById('costTableBody').innerHTML = '';
+    addCostRow();
+    addCostRow();
+    
+    document.getElementById('pfTableBody').innerHTML = '';
+    addPfRow();
+    addPfRow();
+    
+    updatePfRecipeSelect();
 }
 
-function addCalcIngredient() {
-    const container = document.getElementById('calcIngredients');
-    const row = document.createElement('div');
-    row.className = 'calc-ingredient-row';
-    row.innerHTML = '<input type="text" placeholder="Ингредиент" class="calc-ing-name"><input type="number" placeholder="Кол-во" class="calc-ing-amount" oninput="calculateCost()"><input type="number" placeholder="Цена за ед." class="calc-ing-price" oninput="calculateCost()"><select class="unit-select"><option value="ml">мл</option><option value="g">г</option><option value="dash">dash</option><option value="drop">капля</option><option value="pc">шт</option></select><button class="remove-ingredient" onclick="this.parentElement.remove();calculateCost();">×</button>';
-    container.appendChild(row);
+function addCostRow(data) {
+    const tbody = document.getElementById('costTableBody');
+    const tr = document.createElement('tr');
+    const d = data || {};
+    tr.innerHTML = 
+        '<td><input type="text" class="cost-name" placeholder="Виски" value="' + (d.name||'') + '" oninput="calculateCost()"></td>' +
+        '<td><input type="number" class="cost-qty" placeholder="50" value="' + (d.qty||'') + '" oninput="calculateCost()"></td>' +
+        '<td>' + unitSelect('cost-unit', d.unit, 'calculateCost()') + '</td>' +
+        '<td><input type="number" class="cost-pack" placeholder="700" value="' + (d.pack||'') + '" oninput="calculateCost()"></td>' +
+        '<td>' + unitSelect('cost-pack-unit', d.packUnit, 'calculateCost()', true) + '</td>' +
+        '<td><input type="number" class="cost-price" placeholder="2500" value="' + (d.price||'') + '" oninput="calculateCost()"></td>' +
+        '<td class="row-cost">—</td>' +
+        '<td><button class="remove-ingredient" onclick="this.closest(\'tr\').remove();calculateCost();">×</button></td>';
+    tbody.appendChild(tr);
+}
+
+function addPfRow(data) {
+    const tbody = document.getElementById('pfTableBody');
+    const tr = document.createElement('tr');
+    const d = data || {};
+    tr.innerHTML = 
+        '<td><input type="text" class="pf-name" placeholder="Виски" value="' + (d.name||'') + '" oninput="calculatePortion()"></td>' +
+        '<td><input type="number" class="pf-qty" placeholder="50" value="' + (d.qty||'') + '" oninput="calculatePortion()"></td>' +
+        '<td>' + unitSelect('pf-unit', d.unit, 'calculatePortion()') + '</td>' +
+        '<td><input type="number" class="pf-pack" placeholder="700" value="' + (d.pack||'') + '" oninput="calculatePortion()"></td>' +
+        '<td>' + unitSelect('pf-pack-unit', d.packUnit, 'calculatePortion()', true) + '</td>' +
+        '<td><input type="number" class="pf-price" placeholder="2500" value="' + (d.price||'') + '" oninput="calculatePortion()"></td>' +
+        '<td><button class="remove-ingredient" onclick="this.closest(\'tr\').remove();calculatePortion();">×</button></td>';
+    tbody.appendChild(tr);
+}
+
+function unitSelect(cls, val, onchange, includeLarge) {
+    let opts = '<option value="ml"' + (val==='ml'?' selected':'') + '>мл</option>' +
+               '<option value="g"' + (val==='g'?' selected':'') + '>г</option>' +
+               '<option value="dash"' + (val==='dash'?' selected':'') + '>dash</option>' +
+               '<option value="drop"' + (val==='drop'?' selected':'') + '>кап</option>' +
+               '<option value="pc"' + (val==='pc'?' selected':'') + '>шт</option>';
+    if (includeLarge) {
+        opts += '<option value="l"' + (val==='l'?' selected':'') + '>л</option>' +
+                '<option value="kg"' + (val==='kg'?' selected':'') + '>кг</option>';
+    }
+    return '<select class="' + cls + '" onchange="' + onchange + '">' + opts + '</select>';
+}
+
+function toBase(val, unit) {
+    if (unit === 'l' || unit === 'kg') return val * 1000;
+    if (unit === 'dash') return val * 0.9;
+    if (unit === 'drop') return val * 0.05;
+    return val;
 }
 
 function calculateCost() {
-    const rows = document.querySelectorAll('#calcIngredients .calc-ingredient-row');
+    const rows = document.querySelectorAll('#costTableBody tr');
     let totalCost = 0;
-
+    
     rows.forEach(row => {
-        const amount = parseFloat(row.querySelector('.calc-ing-amount').value) || 0;
-        const price = parseFloat(row.querySelector('.calc-ing-price').value) || 0;
-        totalCost += amount * price;
+        const qty = parseFloat(row.querySelector('.cost-qty').value) || 0;
+        const unit = row.querySelector('.cost-unit').value;
+        const pack = parseFloat(row.querySelector('.cost-pack').value) || 0;
+        const packUnit = row.querySelector('.cost-pack-unit').value;
+        const price = parseFloat(row.querySelector('.cost-price').value) || 0;
+        
+        const qtyBase = toBase(qty, unit);
+        const packBase = toBase(pack, packUnit);
+        
+        const rowCost = packBase > 0 ? (qtyBase / packBase) * price : 0;
+        row.querySelector('.row-cost').textContent = rowCost > 0 ? rowCost.toFixed(2) + ' ₽' : '—';
+        totalCost += rowCost;
     });
-
+    
     const sellPrice = parseFloat(document.getElementById('calcSellPrice').value) || 0;
     const foodCost = sellPrice > 0 ? (totalCost / sellPrice * 100).toFixed(1) : 0;
     const markup = totalCost > 0 ? ((sellPrice - totalCost) / totalCost * 100).toFixed(1) : 0;
     const profit = sellPrice - totalCost;
-
+    
     document.getElementById('costPerPortion').textContent = totalCost.toFixed(2) + ' ₽';
     document.getElementById('foodCostPercent').textContent = foodCost + '%';
-    document.getElementById('markupPercent').textContent = markup + '%';
+    document.getElementById('markupPercentCalc').textContent = markup + '%';
     document.getElementById('profitPerPortion').textContent = profit.toFixed(2) + ' ₽';
     document.getElementById('costResult').style.display = 'block';
 }
 
+function saveCalcRecipe() {
+    const name = document.getElementById('calcName').value.trim();
+    if (!name) { alert('Введите название рецепта'); return; }
+    
+    const rows = document.querySelectorAll('#costTableBody tr');
+    const ingredients = [];
+    rows.forEach(row => {
+        ingredients.push({
+            name: row.querySelector('.cost-name').value,
+            qty: row.querySelector('.cost-qty').value,
+            unit: row.querySelector('.cost-unit').value,
+            pack: row.querySelector('.cost-pack').value,
+            packUnit: row.querySelector('.cost-pack-unit').value,
+            price: row.querySelector('.cost-price').value
+        });
+    });
+    
+    const recipes = JSON.parse(localStorage.getItem('proofbook_calc_recipes') || '[]');
+    const existing = recipes.findIndex(r => r.name === name);
+    const recipe = { 
+        name, 
+        ingredients, 
+        sellPrice: document.getElementById('calcSellPrice').value, 
+        updatedAt: new Date().toISOString() 
+    };
+    if (existing >= 0) recipes[existing] = recipe;
+    else recipes.push(recipe);
+    
+    localStorage.setItem('proofbook_calc_recipes', JSON.stringify(recipes));
+    alert('Рецепт сохранён! Теперь его можно загрузить в «Расчёт п/ф»');
+    updatePfRecipeSelect();
+}
+
+function clearCalcForm() {
+    document.getElementById('calcName').value = '';
+    document.getElementById('calcSellPrice').value = '';
+    document.getElementById('costTableBody').innerHTML = '';
+    document.getElementById('costResult').style.display = 'none';
+    addCostRow();
+    addCostRow();
+}
+
+function updatePfRecipeSelect() {
+    const recipes = JSON.parse(localStorage.getItem('proofbook_calc_recipes') || '[]');
+    const select = document.getElementById('pfRecipeSelect');
+    let html = '<option value="">-- Ввести вручную --</option>';
+    recipes.forEach((r, i) => {
+        html += '<option value="' + i + '">' + r.name + '</option>';
+    });
+    select.innerHTML = html;
+}
+
+function loadPfRecipe() {
+    const idx = document.getElementById('pfRecipeSelect').value;
+    if (idx === '') return;
+    
+    const recipes = JSON.parse(localStorage.getItem('proofbook_calc_recipes') || '[]');
+    const recipe = recipes[parseInt(idx)];
+    if (!recipe) return;
+    
+    document.getElementById('pfTableBody').innerHTML = '';
+    recipe.ingredients.forEach(ing => addPfRow(ing));
+    calculatePortion();
+}
+
 function calculatePortion() {
-    const volume = parseFloat(document.getElementById('bottleVolume').value) || 0;
-    const unit = document.getElementById('bottleUnit').value;
-    const bottlePrice = parseFloat(document.getElementById('bottlePrice').value) || 0;
-    const portionSize = parseFloat(document.getElementById('portionSize').value) || 0;
-    const portionCount = parseFloat(document.getElementById('portionCount').value) || 1;
-
-    const volumeMl = unit === 'l' ? volume * 1000 : volume;
-
-    if (volumeMl === 0 || portionSize === 0) {
+    const count = parseInt(document.getElementById('pfPortionCount').value) || 0;
+    if (count <= 0) {
         document.getElementById('portionResult').style.display = 'none';
         return;
     }
-
-    const totalPortions = Math.floor(volumeMl / portionSize);
-    const portionCost = bottlePrice / totalPortions;
-    const neededMl = portionSize * portionCount;
-    const remainder = volumeMl - neededMl;
-    const fraction = (neededMl / volumeMl * 100).toFixed(1);
-
-    document.getElementById('totalPortions').textContent = totalPortions;
-    document.getElementById('portionCost').textContent = portionCost.toFixed(2) + ' ₽';
-    document.getElementById('bottleRemainder').textContent = remainder + ' мл';
-    document.getElementById('bottleFraction').textContent = fraction + '%';
+    
+    const rows = document.querySelectorAll('#pfTableBody tr');
+    if (rows.length === 0) {
+        document.getElementById('portionResult').style.display = 'none';
+        return;
+    }
+    
+    let html = '<table class="calc-table" style="margin-bottom:8px;"><thead><tr><th>Ингредиент</th><th>На 1 порц.</th><th>Всего нужно</th><th>Упаковка</th><th>Нужно упак.</th><th>Цена упак.</th><th>Сумма</th></tr></thead><tbody>';
+    let totalCost = 0;
+    
+    rows.forEach(row => {
+        const name = row.querySelector('.pf-name').value || '—';
+        const qty = parseFloat(row.querySelector('.pf-qty').value) || 0;
+        const unit = row.querySelector('.pf-unit').value;
+        const pack = parseFloat(row.querySelector('.pf-pack').value) || 0;
+        const packUnit = row.querySelector('.pf-pack-unit').value;
+        const price = parseFloat(row.querySelector('.pf-price').value) || 0;
+        
+        const qtyBase = toBase(qty, unit);
+        const packBase = toBase(pack, packUnit);
+        
+        const totalQty = qty * count;
+        const totalQtyBase = qtyBase * count;
+        const packsNeeded = packBase > 0 ? Math.ceil(totalQtyBase / packBase) : 0;
+        const sum = packsNeeded * price;
+        totalCost += sum;
+        
+        let totalQtyDisplay = totalQty;
+        let totalUnit = unit;
+        if (unit === 'ml' && totalQty >= 1000) { totalQtyDisplay = (totalQty/1000).toFixed(2); totalUnit = 'л'; }
+        if (unit === 'g' && totalQty >= 1000) { totalQtyDisplay = (totalQty/1000).toFixed(2); totalUnit = 'кг'; }
+        if (unit === 'l') { totalQtyDisplay = totalQty.toFixed(2); totalUnit = 'л'; }
+        if (unit === 'kg') { totalQtyDisplay = totalQty.toFixed(2); totalUnit = 'кг'; }
+        
+        html += '<tr>' +
+            '<td>' + name + '</td>' +
+            '<td>' + qty + ' ' + unit + '</td>' +
+            '<td style="color:var(--accent-light);font-weight:500;">' + totalQtyDisplay + ' ' + totalUnit + '</td>' +
+            '<td>' + pack + ' ' + packUnit + '</td>' +
+            '<td style="color:var(--accent);font-weight:600;">' + packsNeeded + '</td>' +
+            '<td>' + price + ' ₽</td>' +
+            '<td>' + sum.toFixed(2) + ' ₽</td>' +
+        '</tr>';
+    });
+    
+    html += '</tbody></table>';
+    document.getElementById('pfResultTable').innerHTML = html;
+    document.getElementById('pfTotalCost').textContent = totalCost.toFixed(2) + ' ₽';
     document.getElementById('portionResult').style.display = 'block';
 }
 
